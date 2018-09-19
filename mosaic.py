@@ -1,5 +1,6 @@
-
+import lib.stitching as stitching
 def main():
+    stitch = stitching.Stitch()
     pass
 
 
