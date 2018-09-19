@@ -13,3 +13,4 @@ TBD
 * All functions should have a docstring consisting of description, parameters, and return value in the format of javadocs.
 * Private methods in classes should start with an underscore character.
 * Functions and variable names will be in camel case format.
+* Functions that don't fit on the screen should be split into multiple functions.
