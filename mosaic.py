@@ -1,6 +1,8 @@
 import lib.stitching as stitching
+import lib.counting as counting
 def main():
-    stitch = stitching.Stitch()
+    stitch = stitching.Stitching()
+    count = counting.Counting()
     pass
 
 
