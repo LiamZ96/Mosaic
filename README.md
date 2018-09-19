@@ -6,6 +6,10 @@ Microbead detecting software written for CSC-450. Intended to stitch together im
 # Installation Instructions
 To download python packages ensure you have the latest version of python3 installed, and that you have it in your path. Then in the command prompt navigate to where you have mosaic installed, and run this command "python -m pip install -r requirements.txt". To install .js files ensure you have npm installed and run "npm install".
 
-
 # Pull Request Instructions
 TBD
+
+# Code Standards 
+* All functions should have a docstring consisting of description, parameters, and return value in the format of javadocs.
+* Private methods in classes should start with an underscore character.
+* Functions and variable names will be in camel case format.
