@@ -2,7 +2,7 @@ import cv2
 import numpy
 
 """
-    Description: a class to deal with stitching images together and handling overlap of the images.
+    Description: a class to deal with counting microbeads in a stitched image.
 """
 class Counting: 
     def __init__(self):
