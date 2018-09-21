@@ -9,7 +9,10 @@ Microbead detecting software written for CSC-450. Intended to stitch together im
 * Run "npm install" to install all dependencies (this might take a while to compile opencv for opencv4nodejs. It took me around 8 minutes).
 
 # Pull Request Instructions
-TBD
+* Open a pull request into master with a clear description of what was changed and why.
+* The pull request will then be reviewed and approved by at least 4 of the 6 collaborators.
+* Once approved the branch will be merged with master. 
+* If the branch being merged with master was a feature branch, it will be deleted.
 
 # Code Standards 
 * All functions should have a docstring consisting of description, parameters, and return value in the format of javadocs.
