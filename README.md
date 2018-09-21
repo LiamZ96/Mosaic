@@ -16,3 +16,5 @@ TBD
 * Private methods in classes should start with an underscore character.
 * Functions and variable names will be in camel case format.
 * Functions that don't fit on the screen should be split into multiple functions.
+* Each javascript file will start with "use strict". 
+* Let and const will be used over var for variable declarations.
