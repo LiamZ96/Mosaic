@@ -4,9 +4,8 @@
 Microbead detecting software written for CSC-450. Intended to stitch together images provided by user and count the total number of microbeads.
 
 # Installation Instructions
-* Start your preferred shell (may need to start as an administrator). Make sure you have cmake >= 3.7 installed and it is in your path https://cmake.org/download/).
-* Globally install windows build tools. run "npm install -g windows-build-tools". This is needed to compile the opencv library which is what opencv4nodejs will do when installing it.
-* Run "npm install" to install all dependencies (this might take a while to compile opencv for opencv4nodejs. It took me around 8 minutes).
+* To download python packages ensure you have the latest version of python3 installed, and that you have it in your path. Then in the command prompt navigate to where you have mosaic installed, and run this command "python -m pip install -r requirements.txt". 
+* To install .js dependencies ensure you have npm installed and run "npm install".
 
 # Pull Request Instructions
 * Open a pull request into master with a clear description of what was changed and why.
