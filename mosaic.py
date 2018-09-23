@@ -2,9 +2,12 @@ import lib.stitching as stitching
 import lib.counting as counting
 
 def main():
-    stitch = stitching.Stitching()
+    stitcher = stitching.Stitching()
     count = counting.Counting()
-    count.countBeads("./test/resources/sampleMaps/map.png")
+
+    stitcher.setDirectory("test/resources/sample3")
+    imagePath = stitcher.createStitchedImage()
+    count.countBeads(imagePath)
 
 
 if __name__ == "__main__":
