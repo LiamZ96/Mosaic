@@ -6,8 +6,9 @@ def main():
     count = counting.Counting()
 
     stitcher.setDirectory("test/resources/sample3")
-    imagePath = stitcher.createStitchedImage()
-    count.countBeads(imagePath)
+    #imagePath = stitcher.stitchOrderedImages()
+    imagePath = stitcher.stitchUnorderedImages()
+    #count.countBeads(imagePath)
 
 
 if __name__ == "__main__":
