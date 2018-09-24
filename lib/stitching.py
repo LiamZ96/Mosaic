@@ -75,7 +75,9 @@ class Stitching:
 			del kpMap[parentKey]
 
 			# Stitch best matching image with parentImage
-			kpMap[parentKey] = self.__stitchImages(parentValue, bestMatch)
+			stitchedImg = self.__stitchImages(parentValue, bestMatch)
+			#print(stitchedImg)
+			kpMap[parentKey] = stitchedImg
 
 		# Get fully stitched
 		stitchedImage = kpMap[next(iter(kpMap))][2]
@@ -108,4 +110,15 @@ class Stitching:
 
 	def __stitchImages(self, firstImage, secondImage):
 		#print(firstImage, secondImage)
-		return firstImage
+		# Create stitcher and stitch images
+		stitcher = cv2.createStitcher()
+		orb = cv2.ORB_create()
+		bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+		status, image = stitcher.stitch([firstImage[2], secondImage[2]])
+		kp, desc = orb.detectAndCompute(image, None)
+		cv2.imshow('Image 1', firstImage[2])
+		cv2.imshow('Image 2', secondImage[2])
+		cv2.imshow("Stitched Image", image)
+		cv2.waitKey(0)
+		cv2.destroyAllWindows()
+		return (kp, desc, image)
