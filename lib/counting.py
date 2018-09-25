@@ -32,4 +32,6 @@ class Counting:
             cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
 
         plt.imshow(cimg),plt.show()
+        return circles
+
         
