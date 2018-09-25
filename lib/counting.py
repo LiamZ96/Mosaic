@@ -21,8 +21,8 @@ class Counting:
         # https://www.pyimagesearch.com/2014/07/21/detecting-circles-images-using-opencv-hough-circles/
         img = cv2.imread(imageMap,0)
         cimg = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
-        circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,dp=1,minDist=20,
-                            param1=50,param2=65,minRadius=0,maxRadius=75)
+        circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,dp=1,minDist=40,
+                            param1=50,param2=55,minRadius=0,maxRadius=75)
 
         circles = np.uint16(np.around(circles))
         for i in circles[0,:]:
