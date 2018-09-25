@@ -5,6 +5,7 @@ def main():
     stitch = stitching.Stitching()
     count = counting.Counting()
     count.countBeads("./test/resources/sampleMaps/map.png")
+    count.getAvgColors("./test/resources/sampleMaps/map.png")
 
 
 if __name__ == "__main__":
