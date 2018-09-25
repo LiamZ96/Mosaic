@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 import random
+import math
 
 """
     Description: a class to deal with counting microbeads in a stitched image.
@@ -36,45 +37,121 @@ class Counting:
         plt.imshow(cimg),plt.show()
         return circles
 
-        
-    def getAvgColors(circleArry, imageMap):
+    """
+        Description: a function that takes a cicle's RGB values and returns if it is water or not
+        @param RGB - tuple containing the average red, green, and blue values of a circle
+        @return a boolean that will be True if the circle is water
+    """ 
+    def isWater(self, RGB):
+        red = RGB[0]
+        green = RGB[1]
+        blue = RGB[2]
+        isWater = False
+
+        # these may need to be adjusted, but a bead will either be white or blackish if small
+        maxRGBValue = 230
+        minRGBValue = 3
+
+        if red >= maxRGBValue and green >= maxRGBValue and blue >= maxRGBValue:
+            isWater = True
+        if red <= minRGBValue and green <= minRGBValue and blue <= minRGBValue:
+            isWater = True 
+        return isWater
+
+    """
+        Description: a function that takes an array representing a circle's[x-coord of center, y-coord of center, radius]
+                    and returns an array containing the bead's average RGB values and a boolean isWater
+        @param circleInfo - array that contains a circle's x and y coordinates of the center and the radius of the circle
+        @param imageMap - a map (image) of the microscope images in color.
+        @return a list containing the RGB tuple and a boolean isWater
+    """        
+    def getAvgColor(self, circleInfo, imageMap):
         random.seed(0)
-        circleArry = [(514, 290, 40), (1106, 962, 40), (465, 280, 40)]
         img = cv2.imread(imageMap)
-        averages = []       
+        imgY = img.shape[0]
+        imgX = img.shape[1]
+        r, g, b = [], [], []
+        x = circleInfo[0]
+        y = circleInfo[1]
+        radius = circleInfo[2]
 
-        print(img.shape)
-        print(img[1106, 962])
+        # this might need to be adjusted
+        # buffer is to eliminate the outside shadows factoring in on the edges of beads
+        buffer = math.ceil(0.3 * radius)
         
-        '''
-        for circle in circleArry:
-            r = []
-            g = []
-            b = []
-            x = circle[0]
-            y = circle[1]
-            radius = circle[2]
+        # 1st quadrant
+        minX = x
+        maxX = x + (radius - buffer)
+        minY = y
+        maxY = y + (radius - buffer)
 
-            print(x,y,radius)
-            print(img[x,y])
-            print(img[x,y][0])
-            #plot points?
-            minX = x - (radius - 10)
-            maxX = x + (radius - 10)
-            minY = y - (radius - 10)
-            maxY = y + (radius - 10)
-            for i in range (0,50):
-                randX = random.randint(minX, maxX)
-                randY = random.randint(minY, maxY)
-                rgb = img[randX, randY]
-                r.append(rgb[0])
-                g.append(rgb[1])
-                b.append(rgb[2])
-            avgRed = np.mean(r)
-            avgGreen = np.mean(g)
-            avgBlue = np.mean(b)
-            print(r)
-            print(avgRed)
-            averages.append([avgRed, avgGreen, avgBlue])
-        print(averages)
-        '''
+        for i in range(0,50):
+            randX = random.randint(minX, maxX)
+            randY = random.randint(minY, maxY)
+            if (randY >= imgY) or (randX >= imgX):
+                pass
+            else:
+                bgr = img[randY, randX]
+                b.append(bgr[0])
+                g.append(bgr[1])
+                r.append(bgr[2])
+
+        # 2nd quadrant
+        minX = x - (radius - buffer)
+        maxX = x
+        minY = y
+        maxY = y + (radius - buffer)
+
+        for i in range(0,50):
+            randX = random.randint(minX, maxX)
+            randY = random.randint(minY, maxY)
+            if (randY >= imgY) or (randX >= imgX):
+                pass
+            else:
+                bgr = img[randY, randX]
+                b.append(bgr[0])
+                g.append(bgr[1])
+                r.append(bgr[2])
+
+        # 3rd quadrant
+        minX = x - (radius - buffer)
+        maxX = x
+        minY = y - (radius - buffer)
+        maxY = y
+
+        for i in range(0,50):
+            randX = random.randint(minX, maxX)
+            randY = random.randint(minY, maxY)
+            if (randY >= imgY) or (randX >= imgX):
+                pass
+            else:
+                bgr = img[randY, randX]
+                b.append(bgr[0])
+                g.append(bgr[1])
+                r.append(bgr[2])
+
+        # 4th quadrant
+        minX = x
+        maxX = x + (radius - buffer)
+        minY = y
+        maxY = y + (radius - buffer)
+
+        for i in range(0,50):
+            randX = random.randint(minX, maxX)
+            randY = random.randint(minY, maxY)
+            if (randY >= imgY) or (randX >= imgX):
+                pass
+            else:
+                bgr = img[randY, randX]
+                b.append(bgr[0])
+                g.append(bgr[1])
+                r.append(bgr[2])
+
+        avgBlue = round(np.mean(b), 2)
+        avgGreen = round(np.mean(g), 2)
+        avgRed = round(np.mean(r), 2)
+        averageRGB = (avgRed, avgGreen, avgBlue)
+        isWater = self.isWater(averageRGB)
+
+        return [averageRGB, isWater]
+        

@@ -4,8 +4,10 @@ import lib.counting as counting
 def main():
     stitch = stitching.Stitching()
     count = counting.Counting()
-    count.countBeads("./test/resources/sampleMaps/map.png")
-    count.getAvgColors("./test/resources/sampleMaps/map.png")
+    circles = count.countBeads("./test/resources/sampleMaps/map.png")
+    for i in circles[0,:]:
+        beadInfo = count.getAvgColor(i,"./test/resources/sampleMaps/map.png")
+        print(beadInfo)
 
 
 if __name__ == "__main__":
