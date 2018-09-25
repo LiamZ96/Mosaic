@@ -16,8 +16,20 @@ class Counting:
         @return an object containing information collected during the counting process.
     """
     def countBeads(self,imageMap):
+        # TODO: REMOVE ME BEFORE MERGING WITH MASTER
+        # This is super helpful. apparently opencv is garbo at documenting this.
+        # https://www.pyimagesearch.com/2014/07/21/detecting-circles-images-using-opencv-hough-circles/
         img = cv2.imread(imageMap,0)
-        fast = cv2.FastFeatureDetector_create()
-        kp = fast.detect(img,None)
-        img2 = cv2.drawKeypoints(img, kp,outImage=np.array([]), color=(255,0,0))
-        plt.imshow(img2),plt.show()
+        cimg = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
+        circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,dp=1,minDist=20,
+                            param1=50,param2=65,minRadius=0,maxRadius=75)
+
+        circles = np.uint16(np.around(circles))
+        for i in circles[0,:]:
+            # draw the outer circle
+            cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
+            # draw the center of the circle
+            cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
+
+        plt.imshow(cimg),plt.show()
+        
