@@ -1,5 +1,6 @@
 import cv2
 import os
+from matplotlib import pyplot as plt
 
 """
 	Description: a class to deal with stitching images together and handling overlap of the images.
@@ -60,18 +61,38 @@ class Stitching:
 			for childKey, childValue in kpMap.items():
 				## Add all the matching keypoint a list
 				if (parentKey != childKey):
-					singleMatches = bf.match(parentValue[1], childValue[1])
-					allMatches[childKey] = len(singleMatches)
+					good = []
+					matches = bf.match(parentValue[1], childValue[1])
+
+					# Get only good matches
+					for m in matches:
+						#print(m.distance)
+						if m.distance < 7:
+							good.append(m)
+
+					#print(len(good))
+					allMatches[childKey] = good
 			
 			# Find value with best match
-			highest = max(allMatches.values())
+			bestKeyPoints = (None, [])
+			for matchKey, matchValue in allMatches.items():
+				if (len(bestKeyPoints[1]) < len(matchValue)):
+					bestKeyPoints = (matchKey, matchValue)
 
 			# TODO: Handle too similar images
-			bestMatchKey = [key for key, value in allMatches.items() if value == highest][0]
-			bestMatch = kpMap[bestMatchKey]
+			bestMatch = kpMap[bestKeyPoints[0]]
+
+			# Sort them in the order of their distance.
+			matches = sorted(bestKeyPoints[1], key = lambda x:x.distance)
+
+			# Draw first 10 matches.
+			img3 = cv2.drawMatches(parentValue[2], parentValue[0], bestMatch[2], bestMatch[0], matches[:10], None, flags=2)
+
+			plt.imshow(img3)
+			plt.show()
 
 			# Remove best matching image from kpMap and replace parentKey
-			del kpMap[bestMatchKey]
+			del kpMap[bestKeyPoints[0]]
 			del kpMap[parentKey]
 
 			# Stitch best matching image with parentImage
@@ -116,8 +137,8 @@ class Stitching:
 		bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 		status, image = stitcher.stitch([firstImage[2], secondImage[2]])
 		kp, desc = orb.detectAndCompute(image, None)
-		cv2.imshow('Image 1', firstImage[2])
-		cv2.imshow('Image 2', secondImage[2])
+		#cv2.imshow('Image 1', firstImage[2])
+		#cv2.imshow('Image 2', secondImage[2])
 		cv2.imshow("Stitched Image", image)
 		cv2.waitKey(0)
 		cv2.destroyAllWindows()
