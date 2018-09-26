@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+import random
 
 """
     Description: a class to deal with counting microbeads in a stitched image.
