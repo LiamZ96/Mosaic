@@ -5,10 +5,10 @@ def main():
     stitch = Stitching()
     count = Counting("./test/resources/sampleMaps/map.png")
     circles = count.getColorBeads()
-    print(circles)
+    for i in circles:
+        print(i)
+        print()
     print("Number of valid color beads found: "+str(len(circles)))
-    print("---------------printing water beads---------------")
-    print(count.waterBeads)
     print("Number of water beads found: "+str(len(count.waterBeads)))
 
 
