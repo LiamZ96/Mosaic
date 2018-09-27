@@ -1,11 +1,11 @@
 import lib.stitching as stitching
-import lib.counting as counting
+#import lib.counting as counting
 
 def main():
     stitcher = stitching.Stitching()
-    count = counting.Counting()
+    #count = counting.Counting()
 
-    stitcher.setDirectory("test/resources/sample3")
+    stitcher.setDirectory("test/resources/sample2s")
     #imagePath = stitcher.stitchOrderedImages()
     imagePath = stitcher.stitchUnorderedImages()
     #count.countBeads(imagePath)

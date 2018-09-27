@@ -17,7 +17,7 @@ class Stitching:
 	"""
 	def stitchOrderedImages(self):
 		# Create stitcher and stitch images
-		stitcher = cv2.createStitcher()
+		stitcher = cv2.createStitcher(True)
 		status, image = stitcher.stitch(self.images)
 
 		if status == cv2.STITCHER_OK:
@@ -50,7 +50,8 @@ class Stitching:
 		for idx, img in enumerate(self.images):
 			kp, desc = orb.detectAndCompute(img, None)
 			kpMap["image" + str(idx)] = (kp, desc, img)
-	
+
+		print("Initial count", len(kpMap))
 		while (len(kpMap) > 1):
 			# Get first kpMap key
 			parentKey = next(iter(kpMap))
@@ -67,7 +68,7 @@ class Stitching:
 					# Get only good matches
 					for m in matches:
 						#print(m.distance)
-						if m.distance < 7:
+						if m.distance < 15:
 							good.append(m)
 
 					#print(len(good))
@@ -79,26 +80,30 @@ class Stitching:
 				if (len(bestKeyPoints[1]) < len(matchValue)):
 					bestKeyPoints = (matchKey, matchValue)
 
+			if (len(bestKeyPoints[1]) == 0):
+				kpMap[bestKeyPoints[0]] = stitchedImg[0]
+				kpMap[parentKey] = stitchedImg[1]
+				print("Skip", len(kpMap))
+				continue
+
 			# TODO: Handle too similar images
 			bestMatch = kpMap[bestKeyPoints[0]]
 
 			# Sort them in the order of their distance.
 			matches = sorted(bestKeyPoints[1], key = lambda x:x.distance)
 
-			# Draw first 10 matches.
-			img3 = cv2.drawMatches(parentValue[2], parentValue[0], bestMatch[2], bestMatch[0], matches[:10], None, flags=2)
-
-			plt.imshow(img3)
-			plt.show()
-
 			# Remove best matching image from kpMap and replace parentKey
 			del kpMap[bestKeyPoints[0]]
 			del kpMap[parentKey]
 
 			# Stitch best matching image with parentImage
-			stitchedImg = self.__stitchImages(parentValue, bestMatch)
+			stitchedImg = self.__stitchImages(parentValue, bestMatch, matches)
 			#print(stitchedImg)
-			kpMap[parentKey] = stitchedImg
+			if (len(stitchedImg) == 3):
+				kpMap[parentKey] = stitchedImg
+			else:
+				kpMap[bestKeyPoints[0]] = stitchedImg[0]
+				kpMap[parentKey] = stitchedImg[1]
 
 		# Get fully stitched
 		stitchedImage = kpMap[next(iter(kpMap))][2]
@@ -129,7 +134,7 @@ class Stitching:
 		for file in os.listdir(self.directory):
 			self.images.append(cv2.imread(os.path.join(self.directory, file), cv2.IMREAD_COLOR))
 
-	def __stitchImages(self, firstImage, secondImage):
+	def __stitchImages(self, firstImage, secondImage, matches):
 		#print(firstImage, secondImage)
 		# Create stitcher and stitch images
 		stitcher = cv2.createStitcher()
@@ -137,9 +142,18 @@ class Stitching:
 		bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 		status, image = stitcher.stitch([firstImage[2], secondImage[2]])
 		kp, desc = orb.detectAndCompute(image, None)
-		#cv2.imshow('Image 1', firstImage[2])
-		#cv2.imshow('Image 2', secondImage[2])
-		cv2.imshow("Stitched Image", image)
-		cv2.waitKey(0)
-		cv2.destroyAllWindows()
-		return (kp, desc, image)
+
+		print(status)
+		
+		if (status == 0):
+			# Draw first 10 matches.
+			img3 = cv2.drawMatches(firstImage[2], firstImage[0], secondImage[2], secondImage[0], matches[:10], None, flags=2)
+
+			plt.imshow(img3)
+			plt.show()
+			cv2.imshow("Stitched Image", image)
+			cv2.waitKey(0)
+			cv2.destroyAllWindows()
+			return (kp, desc, image)
+		else:
+			return (firstImage, secondImage)
