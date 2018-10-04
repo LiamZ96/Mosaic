@@ -6,9 +6,8 @@ def main():
     count = counting.Counting()
     circles = count.countBeads("./test/resources/sampleMaps/map.png")
     for i in circles[0,:]:
-        beadInfo = count.getAvgColor(i,"./test/resources/sampleMaps/map.png")
+        beadInfo = count.getBrightestColor(i,"./test/resources/sampleMaps/map.png")
         print(beadInfo)
-
 
 if __name__ == "__main__":
     main()
