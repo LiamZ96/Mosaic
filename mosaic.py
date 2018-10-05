@@ -11,6 +11,5 @@ def main():
     print(count.waterBeads)
     print("Number of water beads found: "+str(len(count.waterBeads)))
 
-
 if __name__ == "__main__":
     main()
