@@ -4,11 +4,28 @@ from matplotlib import pyplot as plt
 import random
 import math
 import itertools
+from enum import Enum
+
+"""
+    Description: an enum class to handle the HoughCircle configuration values that are used in cv2.HoughCircles().
+"""
+class HoughConfig(Enum): 
+    # TODO: REMOVE ME BEFORE MERGING WITH MASTER
+    # This is super helpful. apparently opencv is garbo at documenting this.
+    # https://www.pyimagesearch.com/2014/07/21/detecting-circles-images-using-opencv-hough-circles/
+
+    # 4x magnification 
+    OBJX4 = { "dp": 1,"minDist": 40,"param1": 50,"param2": 55,"minRadius": 0,"maxRadius": 75 }
+
+    # 10x magnification 
+    # TODO: generate actual preset values for this magnification
+    OBJX10 = { "dp": 1,"minDist": 40,"param1": 50,"param2": 55,"minRadius": 0,"maxRadius": 75 }
 
 """
     Description: a class to deal with counting microbeads in a stitched image.
 """
 class Counting: 
+
 
     def __init__(self,imagePath):
         self.imagePath = imagePath
@@ -16,20 +33,21 @@ class Counting:
         self.colorMap = cv2.imread(imagePath) # create color cv2 img
         self.colorBeads = []
         self.waterBeads = []
+        
 
     """
         Description: a function that takes a map of images and counts the beads.
+        @Param houghConfig - a HoughConfig object that contains the values for the HoughCircles() function
         @return an object containing information collected during the counting process.
     """
-    def getColorBeads(self):
+    def getColorBeads(self,houghConfig):
+        houghConfig = houghConfig.value
         result = []
-        # TODO: REMOVE ME BEFORE MERGING WITH MASTER
-        # This is super helpful. apparently opencv is garbo at documenting this.
-        # https://www.pyimagesearch.com/2014/07/21/detecting-circles-images-using-opencv-hough-circles/
+        
         img = self.grayScaleMap
         cimg = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
-        circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,dp=1,minDist=40,
-                            param1=50,param2=55,minRadius=0,maxRadius=75)
+        circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,dp=houghConfig["dp"],minDist=houghConfig["minDist"],
+                            param1=houghConfig["param1"],param2=houghConfig["param2"],minRadius=houghConfig["minRadius"],maxRadius=houghConfig["maxRadius"])
 
         circles = np.uint16(np.around(circles))
         for i in circles[0,:]:
