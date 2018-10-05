@@ -39,7 +39,7 @@ class Counting:
             # draw the center of the circle
             cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
 
-            color = self.getAvgColor(i)
+            color = self.getBrightestColor(i,self.imagePath)
             if(color[1] == False): # if the bead is a water bead, leave it out.
                 self.colorBeads.append(color)
                 result.append(color)
@@ -48,7 +48,27 @@ class Counting:
 
         plt.imshow(cimg),plt.show() # show the beads that have been detected
         return result 
+        
+    """
+        Description: a function that takes a cicle's RGB values and returns if it is water or not
+        @param RGB - tuple containing the average red, green, and blue values of a circle
+        @return a boolean that will be True if the circle is water
+    """ 
+    def isWater(self, RGB):
+        red = RGB[0]
+        green = RGB[1]
+        blue = RGB[2]
+        isWater = False
 
+        # these may need to be adjusted, but a bead will either be white or blackish if small
+        maxRGBValue = 230
+        minRGBValue = 3
+
+        if red >= maxRGBValue and green >= maxRGBValue and blue >= maxRGBValue:
+            isWater = True
+        if red <= minRGBValue and green <= minRGBValue and blue <= minRGBValue:
+            isWater = True 
+        return isWater
 
     def getQuadrantRGBSamples(self, minX, minY, maxX, maxY, imgX, imgY, img):
         b, g, r = [], [], []
