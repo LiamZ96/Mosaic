@@ -1,1 +1,0 @@
-QUnit.config.reorder = false;
