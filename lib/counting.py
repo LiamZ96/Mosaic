@@ -18,8 +18,7 @@ class HoughConfig(Enum):
     OBJX4 = { "dp": 1,"minDist": 40,"param1": 50,"param2": 55,"minRadius": 0,"maxRadius": 75 }
 
     # 10x magnification 
-    # TODO: generate actual preset values for this magnification
-    OBJX10 = { "dp": 1,"minDist": 40,"param1": 50,"param2": 55,"minRadius": 0,"maxRadius": 75 }
+    OBJX10 = { "dp": 1,"minDist": 60,"param1": 65,"param2": 68,"minRadius": 0,"maxRadius": 125 }
 
 """
     Description: a class to deal with counting microbeads in a stitched image.
