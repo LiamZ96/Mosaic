@@ -88,7 +88,8 @@ class Counting:
             isWater = True 
         return isWater
 
-    def getQuadrantRGBSamples(self, minX, minY, maxX, maxY, imgX, imgY, img):
+    def getQuadrantRGBSamples(self, minX, minY, maxX, maxY, imgX, imgY):
+        img = self.colorMap
         b, g, r = [], [], []
         for i in range(0,50):
             randX = random.randint(minX, maxX)
@@ -131,7 +132,7 @@ class Counting:
         minY = y
         maxY = y + (radius - buffer)
 
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY, img)
+        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
         r.append(quadRGB[0])
         g.append(quadRGB[1])
         b.append(quadRGB[2])
@@ -142,7 +143,7 @@ class Counting:
         minY = y
         maxY = y + (radius - buffer)
 
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY, img)
+        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
         r.append(quadRGB[0])
         g.append(quadRGB[1])
         b.append(quadRGB[2])
@@ -153,7 +154,7 @@ class Counting:
         minY = y - (radius - buffer)
         maxY = y
 
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY, img)
+        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
         r.append(quadRGB[0])
         g.append(quadRGB[1])
         b.append(quadRGB[2])
@@ -164,7 +165,7 @@ class Counting:
         minY = y
         maxY = y + (radius - buffer)
 
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY, img)
+        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
         r.append(quadRGB[0])
         g.append(quadRGB[1])
         b.append(quadRGB[2])
