@@ -56,7 +56,7 @@ class Counting:
             # draw the center of the circle
             cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
 
-            color = self.getBrightestColor(i,self.imagePath)
+            color = self.getBrightestColor(i)
             if(color[1] == False): # if the bead is a water bead, leave it out.
                 self.colorBeads.append(color)
                 result.append(color)
@@ -87,7 +87,8 @@ class Counting:
             isWater = True 
         return isWater
 
-    def getQuadrantRGBSamples(self, minX, minY, maxX, maxY, imgX, imgY, img):
+    def getQuadrantRGBSamples(self, minX, minY, maxX, maxY, imgX, imgY):
+        img = self.colorMap
         b, g, r = [], [], []
         for i in range(0,50):
             randX = random.randint(minX, maxX)
@@ -130,7 +131,7 @@ class Counting:
         minY = y
         maxY = y + (radius - buffer)
 
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY, img)
+        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
         r.append(quadRGB[0])
         g.append(quadRGB[1])
         b.append(quadRGB[2])
@@ -141,7 +142,7 @@ class Counting:
         minY = y
         maxY = y + (radius - buffer)
 
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY, img)
+        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
         r.append(quadRGB[0])
         g.append(quadRGB[1])
         b.append(quadRGB[2])
@@ -152,7 +153,7 @@ class Counting:
         minY = y - (radius - buffer)
         maxY = y
 
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY, img)
+        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
         r.append(quadRGB[0])
         g.append(quadRGB[1])
         b.append(quadRGB[2])
@@ -163,7 +164,7 @@ class Counting:
         minY = y
         maxY = y + (radius - buffer)
 
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY, img)
+        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
         r.append(quadRGB[0])
         g.append(quadRGB[1])
         b.append(quadRGB[2])
@@ -186,8 +187,8 @@ class Counting:
         @param imageMap - a map (image) of the microscope images in color.
         @return a list containing tuple with average RGB values of top 10% from bead and boolean isWater
     """        
-    def getBrightestColor(self, circleInfo, imageMap):
-        img = cv2.imread(imageMap)
+    def getBrightestColor(self, circleInfo):
+        img = self.colorMap
         imgY = img.shape[0]
         imgX = img.shape[1]
         x = circleInfo[0]
