@@ -1,5 +1,4 @@
 import os
-import webbrowser
 from flask import Flask
 
 
@@ -28,7 +27,6 @@ def create_app(test_config=None):
     @app.route('/test')
     def test():
         return 'Test message please ignore.'
-    url = "http://127.0.0.1:5000/test"
-    webbrowser.open(url, new=2) #Opens in new tab if possible
+        
     return app
 
