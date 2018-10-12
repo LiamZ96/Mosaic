@@ -6,7 +6,7 @@ PORT = 5000
 
 def main(): 
     http_server = WSGIServer(('', PORT), server.create_app()) #create wsgi server 
-    url = "http://localhost:"+str(PORT)+"/test"
+    url = "http://localhost:"+str(PORT)+"/"
     webbrowser.open(url, new=2) #Opens in new tab if possible
     http_server.serve_forever()
 

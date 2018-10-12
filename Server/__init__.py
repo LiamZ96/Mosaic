@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask,render_template
 
 
 def create_app(test_config=None):
@@ -23,10 +23,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page 
-    @app.route('/test')
-    def test():
-        return 'Test message please ignore.'
+    @app.route('/')
+    @app.route('/index')
+    def index():
+        return render_template('index.html')
         
     return app
 
