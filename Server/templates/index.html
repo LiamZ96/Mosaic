@@ -7,6 +7,17 @@
     </head>
     <body>
         Welcome to M.O.S.A.I.C
+
+        <form action="/uploadImages" method="post" enctype="multipart/form-data">
+            <input type="file" name="images" accept="image/jpeg,image/png" multiple>
+            <input type="submit">
+        </form>
+
+        <form action="/uploadVideo" method="post" enctype="multipart/form-data">
+            <input type="file" name="video" accept="video/mp4">
+            <input type="submit">
+        </form>
+
         <script src="/resources/js/index.js"></script>
     </body>
 </html>
