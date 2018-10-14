@@ -31,4 +31,10 @@ def uploadImages():
         print("Secure filename: "+str(secure_filename(i.filename))) #escape the filename
     return redirect(url_for('index')) #redirect to homepage
 
+@app.route('/uploadVideo', methods=["POST"])
+def uploadVideo(): 
+    video = request.files['video']
 
+    print("Video is permitted: "+str(isFileAllowed(video.filename,ALLOWED_VIDEO_EXTENSIONS))) #see if the image format is allowed
+    print("Secure filename: "+str(secure_filename(video.filename))) #escape the filename
+    return redirect(url_for('index')) #redirect to homepage
