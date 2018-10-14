@@ -40,6 +40,7 @@ def uploadVideo():
 
     print("Video is permitted: "+str(isFileAllowed(video.filename,ALLOWED_VIDEO_EXTENSIONS))) #see if the image format is allowed
     print("Secure filename: "+str(secure_filename(video.filename))) #escape the filename
+    #TODO: place video in a unique directory
     return redirect(url_for('index')) #redirect to homepage
 
 # accepts a path to the image directory to use for stitching
@@ -50,4 +51,14 @@ def getStitchedImage(directory):
     #TODO: start stitching process from a given directory
     #TODO: place stitched images into a directory within the image directory
     #TODO: return link to the stitched image
+    return "" 
+
+# accepts a path to the stitched image directory
+@app.route('/getResults/<path:directory>')
+def getResults(directory): 
+    print("getting getResults")
+    print(directory)
+    #TODO: count beads in stitched image
+    #TODO: format results from bead counting 
+    #TODO: return results and store them locally
     return "" 
