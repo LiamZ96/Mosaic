@@ -29,6 +29,9 @@ def uploadImages():
     for i in images: 
         print("Image is permitted: "+str(isFileAllowed(i.filename,ALLOWED_IMAGE_EXTENSIONS))) #see if the image format is allowed
         print("Secure filename: "+str(secure_filename(i.filename))) #escape the filename
+    
+    #TODO: place images in a unique directory 
+    #TODO: return location of the directory to the user
     return redirect(url_for('index')) #redirect to homepage
 
 @app.route('/uploadVideo', methods=["POST"])
@@ -38,3 +41,13 @@ def uploadVideo():
     print("Video is permitted: "+str(isFileAllowed(video.filename,ALLOWED_VIDEO_EXTENSIONS))) #see if the image format is allowed
     print("Secure filename: "+str(secure_filename(video.filename))) #escape the filename
     return redirect(url_for('index')) #redirect to homepage
+
+# accepts a path to the image directory to use for stitching
+@app.route('/getStitchedImage/<path:directory>')
+def getStitchedImage(directory): 
+    print("getting stiched image")
+    print(directory)
+    #TODO: start stitching process from a given directory
+    #TODO: place stitched images into a directory within the image directory
+    #TODO: return link to the stitched image
+    return "" 
