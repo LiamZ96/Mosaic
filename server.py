@@ -1,4 +1,4 @@
-from server import app
+from Server import app
 import webbrowser
 from gevent.pywsgi import WSGIServer
 
