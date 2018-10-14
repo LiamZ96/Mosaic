@@ -1,5 +1,6 @@
 from . import app
-from flask import render_template, send_from_directory
+import flask
+from flask import render_template, send_from_directory, request
 
 # route for serving static resources (images/js/css)
 @app.route('/resources/<path:path>')
@@ -9,3 +10,9 @@ def send_js(path):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/uploadImages', methods=["POST"])
+def uploadImages(): 
+    images = request.files.getlist("images")
+    print(images)
+    return ""
