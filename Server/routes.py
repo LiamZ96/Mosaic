@@ -1,6 +1,8 @@
 from . import app
 from flask import render_template, send_from_directory, request, url_for, redirect
 from werkzeug.utils import secure_filename
+from lib.counting import *
+from lib.stitching import *
 
 ALLOWED_IMAGE_EXTENSIONS = set(['jpg', 'jpeg'])
 ALLOWED_VIDEO_EXTENSIONS = set(['mp4'])
@@ -72,7 +74,14 @@ def getStitchedImage(directory):
 def getResults(directory): 
     print("getting getResults")
     print(directory)
-    #TODO: count beads in stitched image
+    results = ""
     #TODO: format results from bead counting 
     #TODO: return results and store them locally
-    return "" 
+
+    count = Counting(directory)
+    #TODO: add logic here for config
+    circles = count.getColorBeads(HoughConfig.OBJX10)
+    results += "Valid beads: " + str(len(circles))
+    results += "/n" + "Water beads: " + str(len(count.waterBeads))
+
+    return results 
