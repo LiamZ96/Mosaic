@@ -1,6 +1,7 @@
 import cv2
 import os
 from matplotlib import pyplot as plt
+import time
 
 """
 	Description: a class to deal with stitching images together and handling overlap of the images.
@@ -47,7 +48,7 @@ class Stitching:
 		kpMap = {}
 		match_level = 0
 		match_threshold =15
-		partial_images ={}
+		parentKey = None
 		
 		# Iterate through images and detect keypoints for each image and store in dictonary
 		for idx, img in enumerate(self.images):
@@ -57,14 +58,14 @@ class Stitching:
 		print("Initial count", len(kpMap))
 		while (len(kpMap) > 1):
 			# Get first kpMap key
-			parentKey = next(iter(kpMap))
+			if(parentKey == None):
+				parentKey = next(iter(kpMap))
 			parentValue = kpMap[parentKey]
 			allMatches = {}
-			print("match_level is " + str(match_level)+ " images is " + str(len(kpMap)))
 			if(match_level > len(kpMap)):
 				match_threshold +=10
-				print("threashold is " + str(match_threshold))
 			# Second Iteration to find all the matching keypoints for parentKeypoints
+			test = kpMap.items()
 			for childKey, childValue in kpMap.items():
 				## Add all the matching keypoint a list
 				if (parentKey != childKey):
@@ -73,11 +74,8 @@ class Stitching:
 
 					# Get only good matches
 					for m in matches:
-						#print(m.distance)
 						if m.distance < match_threshold:
 							good.append(m)
-
-					#print(len(good))
 					allMatches[childKey] = good
 			
 			# Find value with best match
@@ -86,14 +84,9 @@ class Stitching:
 				if (len(bestKeyPoints[1]) < len(matchValue)):
 					bestKeyPoints = (matchKey, matchValue)
 			
-			if (len(bestKeyPoints[1]) == 0 or match_level >99):				
-				kpMap[bestKeyPoints[0]] = stitchedImg[0]
-				kpMap[parentKey] = stitchedImg[1]
-				match_level =0
-				match_threshold =15
-				imagePath = os.path.join(resultsDir, "single_image"+str(len(kpMap)) +".jpg")				
-				cv2.imwrite(imagePath,kpMap[parentKey][2])			
-				del kpMap[parentKey]	
+			if (len(bestKeyPoints[1]) == 0):
+				match_level +=1
+				match_threshold +=10
 				continue
 			
 
@@ -103,22 +96,23 @@ class Stitching:
 			matches = sorted(bestKeyPoints[1], key = lambda x:x.distance)
 			# Stitch best matching image with parentImage
 			stitchedImg = self.__stitchImages(parentValue, bestMatch, matches)
-			#print(stitchedImg)
 			if (len(stitchedImg) == 3):
 				kpMap[parentKey] = stitchedImg
 				match_level =0
+				match_threshold = 0
 				del kpMap[bestKeyPoints[0]]
 			else:
 				match_level +=1
-				kpMap[bestKeyPoints[0]] = stitchedImg[0]
-				kpMap[parentKey] = stitchedImg[1]
-			if(match_level > 99):			 
+				#kpMap[bestKeyPoints[0]] = stitchedImg[0]
+				#kpMap[parentKey] = stitchedImg[1]
+			if(match_level > (len(kpMap)+ 25)):			 
 				resultsDir = os.path.join(os.path.dirname(__file__), "..", "results")
 				match_level =0
 				match_threshold =15
-				imagePath = os.path.join(resultsDir, "stiched_image"+str(len(kpMap)) +".jpg")				
+				imagePath = os.path.join(resultsDir, "stiched_"+str(parentKey) +".jpg")				
 				cv2.imwrite(imagePath,kpMap[parentKey][2])
 				del kpMap[parentKey]
+				parentKey = None
 			
 		# Check if results directory exist, if not create it
 		if not os.path.exists(resultsDir):
@@ -158,8 +152,8 @@ class Stitching:
 			# Draw first 10 matches.
 			img3 = cv2.drawMatches(firstImage[2], firstImage[0], secondImage[2], secondImage[0], matches[:10], None, flags=2)
 
-			plt.imshow(img3)
-			plt.show()
+			#lt.imshow(img3)
+			#plt.show()
 			#cv2.imshow("Stitched Image", image)
 			#cv2.waitKey(10000)
 			#cv2.destroyAllWindows()

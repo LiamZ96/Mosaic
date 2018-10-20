@@ -2,7 +2,7 @@ import stitching
 import cv2
 
 demo = stitching.Stitching()
-demo.setDirectory('/home/jcarpenter/Documents/school/Mosaic/test/resources/sample3/')
+demo.setDirectory('/home/jcarpenter/Documents/school/Mosaic/test/resources/sample2/')
 temp = demo.stitchUnorderedImages()
 '''
 writer = cv2
