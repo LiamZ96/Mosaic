@@ -151,12 +151,6 @@ class Stitching:
 		if (status == 0):
 			# Draw first 10 matches.
 			img3 = cv2.drawMatches(firstImage[2], firstImage[0], secondImage[2], secondImage[0], matches[:10], None, flags=2)
-
-			#lt.imshow(img3)
-			#plt.show()
-			#cv2.imshow("Stitched Image", image)
-			#cv2.waitKey(10000)
-			#cv2.destroyAllWindows()
 			return (kp, desc, image)
 		else:
 			return (firstImage, secondImage)
