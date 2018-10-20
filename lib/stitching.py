@@ -9,7 +9,7 @@ class Stitching:
 	def __init__(self):
 		self.images = []
 		self.directory = ""
-        
+		
 
 	"""
 		Description: a function for creating a stitched image from ordered images.
@@ -45,7 +45,10 @@ class Stitching:
 		orb = cv2.ORB_create()
 		bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 		kpMap = {}
-	
+		match_level = 0
+		match_threshold =15
+		partial_images ={}
+		
 		# Iterate through images and detect keypoints for each image and store in dictonary
 		for idx, img in enumerate(self.images):
 			kp, desc = orb.detectAndCompute(img, None)
@@ -57,7 +60,10 @@ class Stitching:
 			parentKey = next(iter(kpMap))
 			parentValue = kpMap[parentKey]
 			allMatches = {}
-				
+			print("match_level is " + str(match_level)+ " images is " + str(len(kpMap)))
+			if(match_level > len(kpMap)):
+				match_threshold +=10
+				print("threashold is " + str(match_threshold))
 			# Second Iteration to find all the matching keypoints for parentKeypoints
 			for childKey, childValue in kpMap.items():
 				## Add all the matching keypoint a list
@@ -68,7 +74,7 @@ class Stitching:
 					# Get only good matches
 					for m in matches:
 						#print(m.distance)
-						if m.distance < 15:
+						if m.distance < match_threshold:
 							good.append(m)
 
 					#print(len(good))
@@ -79,47 +85,50 @@ class Stitching:
 			for matchKey, matchValue in allMatches.items():
 				if (len(bestKeyPoints[1]) < len(matchValue)):
 					bestKeyPoints = (matchKey, matchValue)
-
-			if (len(bestKeyPoints[1]) == 0):
+			
+			if (len(bestKeyPoints[1]) == 0 or match_level >99):				
 				kpMap[bestKeyPoints[0]] = stitchedImg[0]
 				kpMap[parentKey] = stitchedImg[1]
-				print("Skip", len(kpMap))
+				match_level =0
+				match_threshold =15
+				imagePath = os.path.join(resultsDir, "single_image"+str(len(kpMap)) +".jpg")				
+				cv2.imwrite(imagePath,kpMap[parentKey][2])			
+				del kpMap[parentKey]	
 				continue
+			
 
-			# TODO: Handle too similar images
 			bestMatch = kpMap[bestKeyPoints[0]]
 
 			# Sort them in the order of their distance.
 			matches = sorted(bestKeyPoints[1], key = lambda x:x.distance)
-
-			# Remove best matching image from kpMap and replace parentKey
-			del kpMap[bestKeyPoints[0]]
-			del kpMap[parentKey]
-
 			# Stitch best matching image with parentImage
 			stitchedImg = self.__stitchImages(parentValue, bestMatch, matches)
 			#print(stitchedImg)
 			if (len(stitchedImg) == 3):
 				kpMap[parentKey] = stitchedImg
+				match_level =0
+				del kpMap[bestKeyPoints[0]]
 			else:
+				match_level +=1
 				kpMap[bestKeyPoints[0]] = stitchedImg[0]
 				kpMap[parentKey] = stitchedImg[1]
-
-		# Get fully stitched
-		stitchedImage = kpMap[next(iter(kpMap))][2]
-
-		# Get results directory 
-		resultsDir = os.path.join(os.path.dirname(__file__), "..", "results")
-		imagePath = os.path.join(resultsDir, "stiched_image.jpg")
-
+			if(match_level > 99):			 
+				resultsDir = os.path.join(os.path.dirname(__file__), "..", "results")
+				match_level =0
+				match_threshold =15
+				imagePath = os.path.join(resultsDir, "stiched_image"+str(len(kpMap)) +".jpg")				
+				cv2.imwrite(imagePath,kpMap[parentKey][2])
+				del kpMap[parentKey]
+			
 		# Check if results directory exist, if not create it
 		if not os.path.exists(resultsDir):
 			os.makedirs(resultsDir)
 
-		# Save image in results directory
-		cv2.imwrite(imagePath, stitchedImage)
+		print("Complete")
 		
-		return stitchedImage
+
+		
+		return 0
 
 	"""
 		Description: a function setting the directory for looking for images, this will only be used by a 
@@ -143,7 +152,7 @@ class Stitching:
 		status, image = stitcher.stitch([firstImage[2], secondImage[2]])
 		kp, desc = orb.detectAndCompute(image, None)
 
-		print(status)
+		#print(status)
 		
 		if (status == 0):
 			# Draw first 10 matches.
@@ -151,9 +160,9 @@ class Stitching:
 
 			plt.imshow(img3)
 			plt.show()
-			cv2.imshow("Stitched Image", image)
-			cv2.waitKey(0)
-			cv2.destroyAllWindows()
+			#cv2.imshow("Stitched Image", image)
+			#cv2.waitKey(10000)
+			#cv2.destroyAllWindows()
 			return (kp, desc, image)
 		else:
 			return (firstImage, secondImage)
