@@ -10,8 +10,8 @@ class Stitching:
 	def __init__(self):
 		self.images = []
 		self.directory = ""
-		self.p_size = 800
-		self.e_thresh = 0
+		self.pSize = 800
+		self.eThresh = 0
 		self.resultsDir =""
 		
 
@@ -48,14 +48,14 @@ class Stitching:
 	def twoRoundStitch(self):
 		print("begin first round")
 		self.resultsDir = os.path.join(os.path.dirname(__file__), "..", "temp")
-		self.p_size = 1000
-		self.e_thresh = 0
+		self.pSize = 1000
+		self.eThresh = 0
 		self.stitchUnorderedImages()
 		self.images = []
 		self.setDirectory(self.resultsDir)
 		self.resultsDir = os.path.join(os.path.dirname(__file__),"..", "results")
-		self.p_size=200
-		self.e_thresh=200
+		self.pSize=200
+		self.eThresh=200
 		print("begin second round")
 		self.stitchUnorderedImages()
 
@@ -63,11 +63,11 @@ class Stitching:
 		if not os.path.exists(self.resultsDir):
 			os.makedirs(self.resultsDir)
 
-		orb = cv2.ORB_create(WTA_K=4, scaleFactor=1.1,patchSize=self.p_size,edgeThreshold=self.e_thresh)
+		orb = cv2.ORB_create(WTA_K=4, scaleFactor=1.1,patchSize=self.pSize,edgeThreshold=self.eThresh)
 		bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
 		kpMap = {}
-		match_level = 0
-		match_threshold =15
+		matchLevel = 0
+		matchThreshold =15
 		parentKey = None
 		
 		# Iterate through images and detect keypoints for each image and store in dictonary
@@ -87,8 +87,8 @@ class Stitching:
 				parentKey = next(iter(kpMap))
 			parentValue = kpMap[parentKey]
 			allMatches = {}
-			if(match_level > len(kpMap)):
-				match_threshold +=10
+			if(matchLevel > len(kpMap)):
+				matchThreshold +=10
 			# Second Iteration to find all the matching keypoints for parentKeypoints
 			test = kpMap.items()
 			for childKey, childValue in kpMap.items():
@@ -99,7 +99,7 @@ class Stitching:
 
 					# Get only good matches
 					for m in matches:
-						if m.distance < match_threshold:
+						if m.distance < matchThreshold:
 							good.append(m)
 					allMatches[childKey] = good
 			
@@ -110,8 +110,8 @@ class Stitching:
 					bestKeyPoints = (matchKey, matchValue)
 			
 			if (len(bestKeyPoints[1]) == 0):
-				match_level +=1
-				match_threshold +=10
+				matchLevel +=1
+				matchThreshold +=10
 				continue
 			
 
@@ -123,16 +123,16 @@ class Stitching:
 			stitchedImg = self.__stitchImages(parentValue, bestMatch, matches)
 			if (len(stitchedImg) == 3):
 				kpMap[parentKey] = stitchedImg
-				match_level =0
-				match_threshold = 0
+				matchLevel =0
+				matchThreshold = 0
 				del kpMap[bestKeyPoints[0]]
 			else:
-				match_level +=1
+				matchLevel +=1
 				#kpMap[bestKeyPoints[0]] = stitchedImg[0]
 				#kpMap[parentKey] = stitchedImg[1]
-			if(match_level > (len(kpMap)+ 25)):			 				
-				match_level =0
-				match_threshold =15
+			if(matchLevel > (len(kpMap)+ 25)):			 				
+				matchLevel =0
+				matchThreshold =15
 				imagePath = os.path.join(self.resultsDir, "stiched_"+str(parentKey) +".jpg")				
 				cv2.imwrite(imagePath,kpMap[parentKey][2])
 				del kpMap[parentKey]
@@ -165,7 +165,7 @@ class Stitching:
 		#print(firstImage, secondImage)
 		# Create stitcher and stitch images
 		stitcher = cv2.createStitcher()
-		orb = cv2.ORB_create(WTA_K=4, scaleFactor=1.1,patchSize=self.p_size, edgeThreshold=self.e_thresh)
+		orb = cv2.ORB_create(WTA_K=4, scaleFactor=1.1,patchSize=self.pSize, edgeThreshold=self.eThresh)
 		bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
 		status, image = stitcher.stitch([firstImage[2], secondImage[2]])
 		kp, desc = orb.detectAndCompute(image, None)
