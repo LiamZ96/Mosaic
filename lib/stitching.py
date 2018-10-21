@@ -10,6 +10,9 @@ class Stitching:
 	def __init__(self):
 		self.images = []
 		self.directory = ""
+		self.p_size = 800
+		self.e_thresh = 0
+		self.resultsDir =""
 		
 
 	"""
@@ -42,9 +45,26 @@ class Stitching:
 		Description: a function for creating a stitched image from unordered images.
 		@return A stitched image.
 	"""
+	def twoRoundStitch(self):
+		print("begin first round")
+		self.resultsDir = os.path.join(os.path.dirname(__file__), "..", "temp")
+		self.p_size = 1000
+		self.e_thresh = 0
+		self.stitchUnorderedImages()
+		self.images = []
+		self.setDirectory(self.resultsDir)
+		self.resultsDir = os.path.join(os.path.dirname(__file__),"..", "results")
+		self.p_size=200
+		self.e_thresh=200
+		print("begin second round")
+		self.stitchUnorderedImages()
+
 	def stitchUnorderedImages(self):
-		orb = cv2.ORB_create()
-		bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+		if not os.path.exists(self.resultsDir):
+			os.makedirs(self.resultsDir)
+
+		orb = cv2.ORB_create(WTA_K=4, scaleFactor=1.1,patchSize=self.p_size,edgeThreshold=self.e_thresh)
+		bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
 		kpMap = {}
 		match_level = 0
 		match_threshold =15
@@ -53,7 +73,12 @@ class Stitching:
 		# Iterate through images and detect keypoints for each image and store in dictonary
 		for idx, img in enumerate(self.images):
 			kp, desc = orb.detectAndCompute(img, None)
-			kpMap["image" + str(idx)] = (kp, desc, img)
+			if(len(kp) > 0):
+				kpMap["image" + str(idx)] = (kp, desc, img)
+			else:
+				imagePath = os.path.join(self.resultsDir, "stiched_"+str(idx) +".jpg")				
+				cv2.imwrite(imagePath,img)
+
 
 		print("Initial count", len(kpMap))
 		while (len(kpMap) > 1):
@@ -105,18 +130,16 @@ class Stitching:
 				match_level +=1
 				#kpMap[bestKeyPoints[0]] = stitchedImg[0]
 				#kpMap[parentKey] = stitchedImg[1]
-			if(match_level > (len(kpMap)+ 25)):			 
-				resultsDir = os.path.join(os.path.dirname(__file__), "..", "results")
+			if(match_level > (len(kpMap)+ 25)):			 				
 				match_level =0
 				match_threshold =15
-				imagePath = os.path.join(resultsDir, "stiched_"+str(parentKey) +".jpg")				
+				imagePath = os.path.join(self.resultsDir, "stiched_"+str(parentKey) +".jpg")				
 				cv2.imwrite(imagePath,kpMap[parentKey][2])
 				del kpMap[parentKey]
 				parentKey = None
 			
 		# Check if results directory exist, if not create it
-		if not os.path.exists(resultsDir):
-			os.makedirs(resultsDir)
+
 
 		print("Complete")
 		
@@ -135,14 +158,15 @@ class Stitching:
 
 		# Read images and append to image array
 		for file in os.listdir(self.directory):
-			self.images.append(cv2.imread(os.path.join(self.directory, file), cv2.IMREAD_COLOR))
+			if(file.find('jpg') != -1 or file.find('JPG') != -1):
+				self.images.append(cv2.imread(os.path.join(self.directory, file), cv2.IMREAD_COLOR))
 
 	def __stitchImages(self, firstImage, secondImage, matches):
 		#print(firstImage, secondImage)
 		# Create stitcher and stitch images
 		stitcher = cv2.createStitcher()
-		orb = cv2.ORB_create()
-		bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+		orb = cv2.ORB_create(WTA_K=4, scaleFactor=1.1,patchSize=self.p_size, edgeThreshold=self.e_thresh)
+		bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
 		status, image = stitcher.stitch([firstImage[2], secondImage[2]])
 		kp, desc = orb.detectAndCompute(image, None)
 
