@@ -1,3 +1,23 @@
-html {
-    background-color: yellowgreen;
+.caption-text {
+    font-size: 1.25rem;
+    background-color: rgba(45, 45, 45, 0.70);
+    border-radius: 10px;
+    padding: 3px 8px;
+}
+
+.custom-file-label {
+    border-radius: 0 0 .25rem .25rem !important;
+}
+
+#image-upload {
+    cursor:pointer;
+}
+
+#slide-carousel {
+    border: solid #ced4da;
+    border-width: 1px 1px 0px 1px;
+}
+
+#cancel-images {
+    border-top-left-radius: 0;
 }
