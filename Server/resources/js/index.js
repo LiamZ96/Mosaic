@@ -1,9 +1,12 @@
 'use-strict'
 let submit = $('#submit'),
-    imageForm = $('image-form'),
+    imageForm = $('#image-form'),
     cancelImages = $('#cancel-images'),
     imageUpload = $('#image-upload'),
-    slideHolder = $('#slide-holder');
+    slideHolder = $('#slide-holder'),
+    magDropdown = $('#magDropdown'),
+    magLevelButton = $('#magLevelButton'),
+    dropdownItem = $('.dropdown-item');
 
 imageUpload.change(function() {
     cancelImages.click();
@@ -64,6 +67,14 @@ cancelImages.click(function() {
     placeholder.addClass('active');
     slideHolder.append(placeholder);
 });
+
+dropdownItem.on("click", function (e) {
+    e.preventDefault();
+    var magLevel = $(this).html();
+    magLevelButton.text("Mag Level: " + magLevel);
+    $("#magLevelInput").val(magLevel);
+});
+
 
 submit.click(function() {
     imageForm.submit();

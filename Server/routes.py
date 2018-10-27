@@ -34,6 +34,7 @@ def error():
 @app.route('/uploadImages', methods=["POST"])
 def uploadImages(): 
     images = request.files.getlist("images")
+    magLevel = request.form["magLevel"]
     for i in images: 
         #redirect to error page if the image is in an unacceptable
         if(isFileAllowed(i.filename,ALLOWED_IMAGE_EXTENSIONS) == False): 
@@ -42,7 +43,7 @@ def uploadImages():
         print("Image is permitted: "+str(isFileAllowed(i.filename,ALLOWED_IMAGE_EXTENSIONS))) #see if the image format is allowed
         print("Secure filename: "+str(secure_filename(i.filename))) #escape the filename
     
-    #TODO: place images in a unique directory 
+    #TODO: place images in a unique directory
     #TODO: return location of the directory to the user
     return redirect(url_for('index')) #redirect to homepage
 
