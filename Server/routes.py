@@ -1,6 +1,8 @@
 from . import app
 from flask import render_template, send_from_directory, request, url_for, redirect
 from werkzeug.utils import secure_filename
+import lib.counting
+import lib.stitching
 
 ALLOWED_IMAGE_EXTENSIONS = set(['jpg', 'jpeg'])
 ALLOWED_VIDEO_EXTENSIONS = set(['mp4'])
@@ -62,6 +64,12 @@ def uploadVideo():
 def getStitchedImage(directory): 
     print("getting stiched image")
     print(directory)
+
+    stitcher = Stitching()
+    stitcher.setDirectory(directory)
+    imageMap = stitcher.stitchUnorderedImages()
+    
+
     #TODO: start stitching process from a given directory
     #TODO: place stitched images into a directory within the image directory
     #TODO: return link to the stitched image
