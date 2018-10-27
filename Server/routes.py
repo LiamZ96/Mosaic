@@ -71,6 +71,9 @@ def uploadImages():
 @app.route('/uploadVideo', methods=["POST"])
 def uploadVideo(): 
     video = request.files['video']
+
+    newDir = setupUploadDir()
+
     #redirect to the error page if the video is not the correct format
     if(isFileAllowed(video.filename,ALLOWED_VIDEO_EXTENSIONS) == False):
         return redirect(url_for('error',errorMessage="The uploaded video is in the incorrect format. Accepted formats: "+(", ".join(ALLOWED_VIDEO_EXTENSIONS))))
@@ -78,7 +81,9 @@ def uploadVideo():
     print("Video is permitted: "+str(isFileAllowed(video.filename,ALLOWED_VIDEO_EXTENSIONS))) #see if the image format is allowed
     print("Secure filename: "+str(secure_filename(video.filename))) #escape the filename
 
-    #TODO: place video in a unique directory
+    # place video in a unique directory
+    vidPath = newDir + "/videos/" + str(secure_filename(video.filename))
+    video.save(vidPath)
     return redirect(url_for('index')) #redirect to homepage
 
 # accepts a path to the image directory to use for stitching
