@@ -3,6 +3,8 @@ from flask import render_template, send_from_directory, request, url_for, redire
 from werkzeug.utils import secure_filename
 from lib.counting import *
 from lib.stitching import *
+import os
+import datetime
 
 ALLOWED_IMAGE_EXTENSIONS = set(['jpg', 'jpeg'])
 ALLOWED_VIDEO_EXTENSIONS = set(['mp4'])
@@ -35,6 +37,18 @@ def error():
 def uploadImages(): 
     images = request.files.getlist("images")
     magLevel = request.form["magLevel"]
+
+    # create new folder to hold users data for run
+    uploadDir = './Server/resources/uploads'
+    now = datetime.datetime.now()
+    newFolder = now.strftime("%Y-%m-%dT%H_%M_%S")
+    newDir = uploadDir + "/" + newFolder
+    os.mkdir(newDir)
+    subfolders = ['images', 'videos', 'maps', 'results']
+    for folder in subfolders:
+        subDir = newDir + "/" + folder
+        os.mkdir(subDir)
+
     for i in images: 
         #redirect to error page if the image is in an unacceptable
         if(isFileAllowed(i.filename,ALLOWED_IMAGE_EXTENSIONS) == False): 
@@ -42,8 +56,17 @@ def uploadImages():
 
         print("Image is permitted: "+str(isFileAllowed(i.filename,ALLOWED_IMAGE_EXTENSIONS))) #see if the image format is allowed
         print("Secure filename: "+str(secure_filename(i.filename))) #escape the filename
+
+        #file = open(str(secure_filename(i.filename)), "r+")
+        #imageData = f.read()
+        #file.close()
+        imgPath = newDir + "/images/" + str(secure_filename(i.filename))
+        fileCopy = open(imgPath, "w+")
+        fileCopy.write(fileCopy.read())
+        fileCopy.close()
     
     #TODO: place images in a unique directory
+
     #TODO: return location of the directory to the user
     return redirect(url_for('index')) #redirect to homepage
 
