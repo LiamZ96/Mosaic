@@ -49,7 +49,7 @@ def error():
 @app.route('/uploadImages', methods=["POST"])
 def uploadImages(): 
     images = request.files.getlist("images")
-    magLevel = request.form["magLevel"]
+    magLevel = request.form["mag-level"]
 
     newDir = setupUploadDir()
 
@@ -57,7 +57,6 @@ def uploadImages():
         #redirect to error page if the image is in an unacceptable
         if(isFileAllowed(i.filename,ALLOWED_IMAGE_EXTENSIONS) == False): 
             return jsonify({"status": 1, "msg": "One or more of the images that were uploaded are in the incorrect format. Accepted formats: "+(", ".join(ALLOWED_IMAGE_EXTENSIONS))})
-            #redirect(url_for('error',errorMessage="One or more of the images that were uploaded are in the incorrect format. Accepted formats: "+(", ".join(ALLOWED_IMAGE_EXTENSIONS))))
 
         print("Image is permitted: "+str(isFileAllowed(i.filename,ALLOWED_IMAGE_EXTENSIONS))) #see if the image format is allowed
         print("Secure filename: "+str(secure_filename(i.filename))) #escape the filename

@@ -4,6 +4,10 @@ $(document).ready(function() {
         imageForm = $('#image-form'),
         cancelImages = $('#cancel-images'),
         imageUpload = $('#image-upload'),
+        magBtn = $('#mag-button'),
+        magInput = $('#mag-input'),
+        fourMagSelect = $('#4x'),
+        tenMagSelect = $('#10x'),
         slideHolder = $('#slide-holder'),
         alertContainer = $('#alert-container'),
         overlay = $('#overlay'),
@@ -120,8 +124,22 @@ $(document).ready(function() {
         })
         .fail(postFail)
     });
+    
+    fourMagSelect.click(function(e) {
+        e.preventDefault();
 
-    function postFail() {
+        magInput.value = "4x";
+        magBtn.text("Magnification Level: 4X");
+    });
+
+    tenMagSelect.click(function(e) {
+        e.preventDefault();
+
+        magInput.value = "10x";
+        magBtn.text("Magnification Level: 10X");
+    });
+
+    function postFail(e) {
         let alert = postTimeout ? $('#post-alert') : $('<div id="post-alert" class="alert alert-danger my-3" role="alert"><strong>Error</strong> An error occured while uploading images, please try again later.</div>');
 
         overlay.addClass("d-none");
