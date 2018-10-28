@@ -1,5 +1,5 @@
 from . import app
-from flask import render_template, send_from_directory, request, url_for, redirect, jsonify
+from flask import render_template, send_from_directory, request, url_for, redirect
 from werkzeug.utils import secure_filename
 from lib.counting import *
 from lib.stitching import *
@@ -65,8 +65,6 @@ def uploadImages():
         imgPath = newDir + "/images/" + str(secure_filename(i.filename))
         i.save(imgPath)
     
-
-    #TODO: return location of the directory to the user
     return redirect('/getStitchedImage/' + newDir.split('/')[-1]) #redirect to homepage
 
 @app.route('/uploadVideo', methods=["POST"])
@@ -92,28 +90,16 @@ def uploadVideo():
 def getStitchedImage(directory): 
     dirPrefix="Server/resources/uploads/"
     stitcher = Stitching()
-    stitcher.setDirectory(dirPrefix + directory + "/images") #dirPrefix+directory+"/images"
-    #resultPath = dirPrefix+directory+"/map"+str(numFiles)+".jpg"
+    stitcher.setDirectory(dirPrefix + directory + "/images")
 
-    #!!!REMOVE THIS COMMENT!!!
-    
     imageMap = stitcher.twoRoundStitch()
     numFiles = len([name for name in os.listdir(dirPrefix+directory+"/maps")]) + 1
-    print("Finished stitching")
-    #resultPath = "/resources/uploads/"+directory+"/maps/map.png" #!!!REMOVE THIS!!!!
-    #print(resultPath)
-    #return "<img src='"+resultPath+"'>" #return the stitched map. this is just to show that it's working
     return render_template('stitched.html', numFiles=numFiles)
 
 # accepts a path to the stitched image directory
 @app.route('/getResults/<path:directory>')
 def getResults(directory): 
-    print("getting getResults")
-    print(directory)
-
     results = ""
-    #TODO: format results from bead counting 
-    #TODO: return results and store them locally
     directory = 'Server/resources/uploads/' + directory
     results = directory + '/results/'
     for file in results:
@@ -128,13 +114,10 @@ def getResults(directory):
     water = 0
     images = [file for file in os.listdir(directory) if os.path.isfile((directory+file))]
     for image in images:
-        print(directory+image)
         count = Counting(directory+image)
-        #TODO: add logic here for config
         circles = count.getColorBeads(HoughConfig.OBJX10)
         results += "Valid beads: " + str(len(circles))
         valid += len(circles)
         results += "\n" + "Water beads: " + str(len(count.waterBeads)) +'\n'
         water += len(count.waterBeads)
-    print(results)
     return render_template('results.html', numImages = len(images),validBeads=valid, waterBeads=water) 

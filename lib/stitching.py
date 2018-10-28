@@ -133,8 +133,6 @@ class Stitching:
                                 del kpMap[bestKeyPoints[0]]
                         else:
                                 matchLevel +=1
-                                #kpMap[bestKeyPoints[0]] = stitchedImg[0]
-                                #kpMap[parentKey] = stitchedImg[1]
                         if(matchLevel > (len(kpMap)+ 25)):                                                      
                                 matchLevel =0
                                 matchThreshold =15
@@ -142,14 +140,7 @@ class Stitching:
                                 cv2.imwrite(imagePath,kpMap[parentKey][2])
                                 del kpMap[parentKey]
                                 parentKey = None
-                        
-                # Check if results directory exist, if not create it
 
-
-                print("Complete")
-                
-
-                
                 return 0
 
         """
@@ -158,7 +149,6 @@ class Stitching:
                 @param path - The directory in unix format
         """
         def setDirectory(self, path):
-                print("UPDATING DIRECTORY")
                 # Get directory of test images
                 self.directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", path))
 
@@ -168,15 +158,12 @@ class Stitching:
                                 self.images.append(cv2.imread(os.path.join(self.directory, file), cv2.IMREAD_COLOR))
 
         def __stitchImages(self, firstImage, secondImage, matches):
-                #print(firstImage, secondImage)
                 # Create stitcher and stitch images
                 stitcher = cv2.createStitcher()
                 orb = cv2.ORB_create(WTA_K=4, scaleFactor=1.1,patchSize=self.pSize, edgeThreshold=self.eThresh)
                 bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
                 status, image = stitcher.stitch([firstImage[2], secondImage[2]])
                 kp, desc = orb.detectAndCompute(image, None)
-
-                #print(status)
                 
                 if (status == 0):
                         # Draw first 10 matches.

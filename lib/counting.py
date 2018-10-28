@@ -11,9 +11,6 @@ from os import listdir, path
     Description: an enum class to handle the HoughCircle configuration values that are used in cv2.HoughCircles().
 """
 class HoughConfig(Enum): 
-    # TODO: REMOVE ME BEFORE MERGING WITH MASTER
-    # This is super helpful. apparently opencv is garbo at documenting this.
-    # https://www.pyimagesearch.com/2014/07/21/detecting-circles-images-using-opencv-hough-circles/
 
     # 4x magnification 
     OBJX4 = { "dp": 1,"minDist": 40,"param1": 50,"param2": 55,"minRadius": 0,"maxRadius": 75 }
@@ -63,8 +60,6 @@ class Counting:
                 result.append(color)
             else: 
                 self.waterBeads.append(color)
-
-        #plt.imshow(cimg),plt.show() # show the beads that have been detected
         
         imagePath = '/'.join(self.imagePath.split('/')[:-2]) + '/results/'
         images = [file for file in listdir(imagePath) if path.isfile((imagePath+file))]
@@ -84,7 +79,7 @@ class Counting:
         blue = RGB[2]
         isWater = False
 
-        # these may need to be adjusted, but a bead will either be white or blackish if small
+        
         maxRGBValue = 230
         minRGBValue = 3
 
@@ -241,7 +236,6 @@ class Counting:
         @return a zip of the coordinates within a circle
     """ 
     def getPointsInCircle(self, radius, centerX, centerY):
-        # https://stackoverflow.com/questions/49551440/python-all-points-on-circle-given-radius-and-center
         a = np.arange(radius + 1)
         for x, y in zip(*np.where(a[:, np.newaxis]**2 + a**2 <= radius**2)):
             # x and y given here were assuming that the center was at 0,0 therefore you must add the actual center coordinates to give accurate ones back
