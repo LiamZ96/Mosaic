@@ -6,7 +6,9 @@ $(document).ready(function() {
         imageUpload = $('#image-upload'),
         slideHolder = $('#slide-holder'),
         alertContainer = $('#alert-container'),
-        alertTimeout;
+        overlay = $('#overlay'),
+        formatTimeout,
+        postTimeout;
     
     imageUpload.change(function() {
         let invalidFiles;
@@ -14,7 +16,7 @@ $(document).ready(function() {
         cancelImages.click();
 
         invalidFiles = Array.from(this.files).filter(function(file) {
-            return !file.name.endsWith('.jpg');
+            return !(file.name.endsWith('.jpg') || file.name.endsWith('.jpeg'));
         });
     
         if (this.files.length > 0 && invalidFiles.length === 0) {
@@ -56,12 +58,12 @@ $(document).ready(function() {
             });
         }
         else if (invalidFiles.length > 0) {
-            let alert = alertTimeout ? $('#img-alert') : $('<div id="img-alert" class="alert alert-danger my-3" role="alert"><strong>Error</strong> Only files of format .jpg are allowed</div>');
+            let alert = formatTimeout ? $('#img-alert') : $('<div id="img-alert" class="alert alert-danger my-3" role="alert"><strong>Error</strong> Only files of format .jpg and .jpeg are allowed</div>');
 
             this.value = null;
 
-            if (alertTimeout) {
-                clearTimeout(alertTimeout);
+            if (formatTimeout) {
+                clearTimeout(formatTimeout);
             }
             else {
                 alertContainer.prepend(alert);
@@ -69,9 +71,9 @@ $(document).ready(function() {
 
             window.scrollTo(0, 0);
 
-            alertTimeout = setTimeout(function() {
+            formatTimeout = setTimeout(function() {
                 alert.remove();
-                alertTimeout = null;
+                formatTimeout = null;
             }, 15000);
         }
     });
@@ -96,6 +98,8 @@ $(document).ready(function() {
     submit.click(function() {
         let data = new FormData(imageForm[0]);
 
+        overlay.removeClass("d-none");
+
         $.ajax({
             method: 'POST',
             url: '/uploadImages',
@@ -104,6 +108,36 @@ $(document).ready(function() {
             cache: false,
             contentType: false,
             processData: false
-        });
+        })
+        .done(function(e) {
+            if (e.status === 0) {
+                // TODO: Add in location of next view
+                window.location.replace("nextView");
+            }
+            else {
+                postFail();
+            }
+        })
+        .fail(postFail)
     });
+
+    function postFail() {
+        let alert = postTimeout ? $('#post-alert') : $('<div id="post-alert" class="alert alert-danger my-3" role="alert"><strong>Error</strong> An error occured while uploading images, please try again later.</div>');
+
+        overlay.addClass("d-none");
+
+        if (postTimeout) {
+            clearTimeout(postTimeout);
+        }
+        else {
+            alertContainer.prepend(alert);
+        }
+
+        window.scrollTo(0, 0);
+
+        postTimeout = setTimeout(function() {
+            alert.remove();
+            postTimeout = null;
+        }, 15000);
+    }
 });
