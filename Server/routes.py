@@ -89,24 +89,27 @@ def uploadVideo():
 # accepts a path to the image directory to use for stitching
 @app.route('/getStitchedImage/<path:directory>')
 def getStitchedImage(directory): 
-    print("getting stiched image")
-    print(directory)
-
+    dirPrefix="Server/resources/uploads/"
     stitcher = Stitching()
-    stitcher.setDirectory(directory)
-    imageMap = stitcher.stitchUnorderedImages()
-    
+    stitcher.setDirectory(dirPrefix+directory+"/images")
 
-    #TODO: start stitching process from a given directory
-    #TODO: place stitched images into a directory within the image directory
-    #TODO: return link to the stitched image
-    return "" 
+    #get number of files in maps directory to creat unique name for new map.
+    numFiles = len([name for name in os.listdir(dirPrefix+directory+"/maps") if os.path.isfile(name)]) + 1
+    resultPath = dirPrefix+"map"+str(numFiles)+".jpg"
+
+    #!!!REMOVE THIS COMMENT!!!
+    #imageMap = stitcher.stitchUnorderedImages(resultPath) #pass directory to store the map in
+
+    resultPath = "/resources/uploads/"+directory+"/maps/map.png" #!!!REMOVE THIS!!!!
+
+    return "<img src='"+resultPath+"'>" #return the stitched map. this is just to show that it's working
 
 # accepts a path to the stitched image directory
 @app.route('/getResults/<path:directory>')
 def getResults(directory): 
     print("getting getResults")
     print(directory)
+
     results = ""
     #TODO: format results from bead counting 
     #TODO: return results and store them locally
