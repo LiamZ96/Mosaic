@@ -2,6 +2,9 @@ import cv2
 import os
 from matplotlib import pyplot as plt
 import time
+import sys
+from PIL import Image
+import shutil
 
 """
 	Description: a class to deal with stitching images together and handling overlap of the images.
@@ -9,10 +12,10 @@ import time
 class Stitching: 
 	def __init__(self):
 		self.images = []
-		self.directory = ""
+		self.sourceDirectory = ""
 		self.pSize = 800
 		self.eThresh = 0
-		self.resultsDir =""
+		self.resultsDirectory =""
 		
 
 	"""
@@ -26,7 +29,7 @@ class Stitching:
 
 		if status == cv2.STITCHER_OK:
 			# Get results directory 
-			resultsDir = os.path.join(os.path.dirname(__file__), "..", "results")
+			#resultsDir = os.path.join(os.path.dirname(__file__), "..", "results")
 			imagePath = os.path.join(resultsDir, "stiched_image.jpg")
 
 			# Check if results directory exist, if not create it
@@ -45,23 +48,51 @@ class Stitching:
 		Description: a function for creating a stitched image from unordered images.
 		@return A stitched image.
 	"""
+	def collage(self,temp_path):
+		images = []
+		for file in os.listdir(temp_path):
+			if(file.find('jpg') != -1 or file.find('JPG') != -1):
+				images.append(Image.open(str(temp_path) + "/" + str(file)))
+		widths, heights = zip(*(i.size for i in images))
+		total_width = sum(widths)
+		max_height = max(heights)
+
+		new_im = Image.new('RGB', (total_width, max_height))
+
+		x_offset = 0
+		for im in images:
+  			new_im.paste(im, (x_offset,0))
+  			x_offset += im.size[0]
+		
+		new_im.save(self.resultsDirectory + 'map.jpg')
+		shutil.rmtree(temp_path)
+
+
 	def twoRoundStitch(self):
+		completed_images = []
 		print("begin first round")
-		self.resultsDir = os.path.join(os.path.dirname(__file__), "..", "temp")
+		temp_dir = str(int(round(time.time())))
+		temp_dir = temp_dir + "/"
+		os.makedirs(temp_dir)
 		self.pSize = 1000
 		self.eThresh = 0
-		self.stitchUnorderedImages()
-		self.images = []
-		self.setDirectory(self.resultsDir)
-		self.resultsDir = os.path.join(os.path.dirname(__file__),"..", "results")
+		first_round = []
+		first_round = self.stitchUnorderedImages()
+		self.images = [] #reset self.images to empty
+		self.images = first_round
 		self.pSize=200
 		self.eThresh=200
 		print("begin second round")
-		self.stitchUnorderedImages()
+		final_images = self.stitchUnorderedImages()
+		img_number =0
+		for img in final_images:
+			cv2.imwrite(str(temp_dir) + str(img_number) + ".jpg",img)
+			img_number +=1
+		self.collage(temp_dir)
 
 	def stitchUnorderedImages(self):
-		if not os.path.exists(self.resultsDir):
-			os.makedirs(self.resultsDir)
+		#if not os.path.exists(self.resultsDirectory):
+		#	os.makedirs(self.resultsDirectory)
 
 		orb = cv2.ORB_create(WTA_K=4, scaleFactor=1.1,patchSize=self.pSize,edgeThreshold=self.eThresh)
 		bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
@@ -69,6 +100,7 @@ class Stitching:
 		matchLevel = 0
 		matchThreshold =15
 		parentKey = None
+		completed_images = []
 		
 		# Iterate through images and detect keypoints for each image and store in dictonary
 		for idx, img in enumerate(self.images):
@@ -76,8 +108,9 @@ class Stitching:
 			if(len(kp) > 0):
 				kpMap["image" + str(idx)] = (kp, desc, img)
 			else:
-				imagePath = os.path.join(self.resultsDir, "stiched_"+str(idx) +".jpg")				
-				cv2.imwrite(imagePath,img)
+				imagePath = os.path.join(self.resultsDirectory, "stiched_"+str(idx) +".jpg")
+				completed_images.append(img)				
+				#cv2.imwrite(imagePath,img)
 
 
 		print("Initial count", len(kpMap))
@@ -133,19 +166,17 @@ class Stitching:
 			if(matchLevel > (len(kpMap)+ 25)):			 				
 				matchLevel =0
 				matchThreshold =15
-				imagePath = os.path.join(self.resultsDir, "stiched_"+str(parentKey) +".jpg")				
-				cv2.imwrite(imagePath,kpMap[parentKey][2])
+				imagePath = os.path.join(self.resultsDirectory, "stiched_"+str(parentKey) +".jpg")				
+				completed_images.append(kpMap[parentKey][2])
+				#cv2.imwrite(imagePath,kpMap[parentKey][2])
 				del kpMap[parentKey]
 				parentKey = None
 			
 		# Check if results directory exist, if not create it
-
-
-		print("Complete")
 		
 
 		
-		return 0
+		return completed_images
 
 	"""
 		Description: a function setting the directory for looking for images, this will only be used by a 
@@ -154,12 +185,12 @@ class Stitching:
 	"""
 	def setDirectory(self, path):
 		# Get directory of test images
-		self.directory = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", path))
+		self.sourceDirectory = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", path))
 
 		# Read images and append to image array
-		for file in os.listdir(self.directory):
+		for file in os.listdir(self.sourceDirectory):
 			if(file.find('jpg') != -1 or file.find('JPG') != -1):
-				self.images.append(cv2.imread(os.path.join(self.directory, file), cv2.IMREAD_COLOR))
+				self.images.append(cv2.imread(os.path.join(self.sourceDirectory, file), cv2.IMREAD_COLOR))
 
 	def __stitchImages(self, firstImage, secondImage, matches):
 		#print(firstImage, secondImage)
