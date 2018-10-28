@@ -124,6 +124,7 @@ $(document).ready(function() {
     function postFail() {
         let alert = postTimeout ? $('#post-alert') : $('<div id="post-alert" class="alert alert-danger my-3" role="alert"><strong>Error</strong> An error occured while uploading images, please try again later.</div>');
 
+<<<<<<< HEAD
         overlay.addClass("d-none");
 
         if (postTimeout) {
@@ -140,4 +141,16 @@ $(document).ready(function() {
             postTimeout = null;
         }, 15000);
     }
+=======
+dropdownItem.on("click", function (e) {
+    e.preventDefault();
+    var magLevel = $(this).html();
+    magLevelButton.text("Mag Level: " + magLevel);
+    $("#magLevelInput").val(magLevel);
+});
+
+
+submit.click(function() {
+    imageForm.submit();
+>>>>>>> develop
 });
