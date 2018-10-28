@@ -1,13 +1,14 @@
 from . import app
-from flask import render_template, send_from_directory, request, url_for, redirect
+from flask import render_template, send_from_directory, request, url_for, redirect, jsonify
 from werkzeug.utils import secure_filename
 from lib.counting import *
 from lib.stitching import *
 import os
 import datetime
+from PIL import Image
 
 ALLOWED_IMAGE_EXTENSIONS = set(['jpg', 'jpeg'])
-ALLOWED_VIDEO_EXTENSIONS = set(['mp4'])
+ALLOWED_VIDEO_EXTENSIONS = set(['mp4', 'avi'])
 
 """
     Description: a function used to see if the uploaded file is in a valid format.
@@ -22,7 +23,7 @@ def setupUploadDir():
     # create new folder to hold users data for run
     uploadDir = './Server/resources/uploads'
     now = datetime.datetime.now()
-    newFolder = now.strftime("%Y-%m-%dT%H_%M_%S")
+    newFolder = now.strftime("%Y-%m-%dT%H-%M-%S")
     newDir = uploadDir + "/" + newFolder
     os.mkdir(newDir)
     subfolders = ['images', 'videos', 'maps', 'results']
@@ -66,7 +67,7 @@ def uploadImages():
     
 
     #TODO: return location of the directory to the user
-    return redirect(url_for('index')) #redirect to homepage
+    return redirect('/getStitchedImage/' + newDir.split('/')[-1]) #redirect to homepage
 
 @app.route('/uploadVideo', methods=["POST"])
 def uploadVideo(): 
@@ -91,18 +92,18 @@ def uploadVideo():
 def getStitchedImage(directory): 
     dirPrefix="Server/resources/uploads/"
     stitcher = Stitching()
-    stitcher.setDirectory(dirPrefix+directory+"/images")
-
-    #get number of files in maps directory to creat unique name for new map.
-    numFiles = len([name for name in os.listdir(dirPrefix+directory+"/maps") if os.path.isfile(name)]) + 1
-    resultPath = dirPrefix+"map"+str(numFiles)+".jpg"
+    stitcher.setDirectory(dirPrefix + directory + "/images") #dirPrefix+directory+"/images"
+    #resultPath = dirPrefix+directory+"/map"+str(numFiles)+".jpg"
 
     #!!!REMOVE THIS COMMENT!!!
-    #imageMap = stitcher.stitchUnorderedImages(resultPath) #pass directory to store the map in
-
-    resultPath = "/resources/uploads/"+directory+"/maps/map.png" #!!!REMOVE THIS!!!!
-
-    return "<img src='"+resultPath+"'>" #return the stitched map. this is just to show that it's working
+    
+    imageMap = stitcher.twoRoundStitch()
+    numFiles = len([name for name in os.listdir(dirPrefix+directory+"/maps")]) + 1
+    print("Finished stitching")
+    #resultPath = "/resources/uploads/"+directory+"/maps/map.png" #!!!REMOVE THIS!!!!
+    #print(resultPath)
+    #return "<img src='"+resultPath+"'>" #return the stitched map. this is just to show that it's working
+    return render_template('stitched.html', numFiles=numFiles)
 
 # accepts a path to the stitched image directory
 @app.route('/getResults/<path:directory>')
@@ -113,11 +114,27 @@ def getResults(directory):
     results = ""
     #TODO: format results from bead counting 
     #TODO: return results and store them locally
-
-    count = Counting(directory)
-    #TODO: add logic here for config
-    circles = count.getColorBeads(HoughConfig.OBJX10)
-    results += "Valid beads: " + str(len(circles))
-    results += "/n" + "Water beads: " + str(len(count.waterBeads))
-
-    return results 
+    directory = 'Server/resources/uploads/' + directory
+    results = directory + '/results/'
+    for file in results:
+        filePath = os.path.join(results, file)
+        try:
+            if os.path.isfile(filePath):
+                os.unlink(filePath)
+        except Exception as e:
+            print(e)
+    directory += '/maps/'
+    valid = 0
+    water = 0
+    images = [file for file in os.listdir(directory) if os.path.isfile((directory+file))]
+    for image in images:
+        print(directory+image)
+        count = Counting(directory+image)
+        #TODO: add logic here for config
+        circles = count.getColorBeads(HoughConfig.OBJX10)
+        results += "Valid beads: " + str(len(circles))
+        valid += len(circles)
+        results += "\n" + "Water beads: " + str(len(count.waterBeads)) +'\n'
+        water += len(count.waterBeads)
+    print(results)
+    return render_template('results.html', numImages = len(images),validBeads=valid, waterBeads=water) 

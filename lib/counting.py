@@ -5,6 +5,7 @@ import random
 import math
 import itertools
 from enum import Enum
+from os import listdir, path
 
 """
     Description: an enum class to handle the HoughCircle configuration values that are used in cv2.HoughCircles().
@@ -63,7 +64,13 @@ class Counting:
             else: 
                 self.waterBeads.append(color)
 
-        plt.imshow(cimg),plt.show() # show the beads that have been detected
+        #plt.imshow(cimg),plt.show() # show the beads that have been detected
+        
+        imagePath = '/'.join(self.imagePath.split('/')[:-2]) + '/results/'
+        images = [file for file in listdir(imagePath) if path.isfile((imagePath+file))]
+        fileNum = len(images)
+        imagePath += 'result_image' + str(fileNum) +'.jpg'
+        cv2.imwrite(imagePath, cimg)
         return result 
         
     """

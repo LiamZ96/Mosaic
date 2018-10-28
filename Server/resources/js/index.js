@@ -77,5 +77,7 @@ dropdownItem.on("click", function (e) {
 
 
 submit.click(function() {
+	$('#loading').css('display', 'block');
+	$('.container').css('display', 'none');
     imageForm.submit();
 });

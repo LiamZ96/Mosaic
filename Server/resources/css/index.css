@@ -21,3 +21,8 @@
 #cancel-images {
     border-top-left-radius: 0;
 }
+
+#loading{
+	display:none;
+	text-align: center;
+}
