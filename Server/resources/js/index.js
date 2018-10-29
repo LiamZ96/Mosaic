@@ -131,13 +131,13 @@ $(document).ready(function() {
     });
     
     submit.click(function() {
-        let data = imageUpload.val() != null || imageUpload.val() !== '' ? new FormData(imageForm[0]) : new FormData(videoForm[0]);
+        let data = imageUpload.val() != null && imageUpload.val() !== '' ? new FormData(imageForm[0]) : new FormData(videoForm[0]);
 
         overlay.removeClass('d-none');
 
         $.ajax({
             method: 'POST',
-            url: imageUpload.val() != null || imageUpload.val() !== '' ? '/uploadImages' : '/uploadVideo',
+            url: imageUpload.val() != null && imageUpload.val() !== '' ? '/uploadImages' : '/uploadVideo',
             enctype: 'multipart/form-data',
             data: data,
             cache: false,
@@ -147,7 +147,7 @@ $(document).ready(function() {
         .done(function(e) {
             if (e.status === 0) {
                 // TODO: Add in location of next view
-                window.location.replace('nextView');
+                window.location.href = 'nextView';
             }
             else {
                 postFail();
