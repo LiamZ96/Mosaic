@@ -21,7 +21,7 @@
                             <div id='slide-carousel' class='carousel slide' data-ride='carousel'>
                                 <div id='slide-holder' class='carousel-inner'>
                                     <div class='carousel-item active'>
-                                        <img id='placeholder' class='d-block w-100' src='/resources/imgs/no-slides.jpg' alt='No Slides'>
+                                        <img id='img-placeholder' class='d-block w-100' src='/resources/imgs/no-slides.jpg' alt='No Slides'/>
                                     </div>
                                 </div>
                                 <a class='carousel-control-prev d-none' href='#slide-carousel' role='button' data-slide='prev'>
@@ -36,19 +36,14 @@
                             <form id='image-form' enctype='multipart/form-data'>
                                 <div class='input-group'>
                                     <div class='input-group-prepend'>
-                                        <button class='btn btn-danger' type='button' id='cancel-images' disabled>Cancel</button>
+                                        <button class='btn btn-danger cancel-btn' type='button' id='cancel-images' disabled>Cancel</button>
                                     </div>
                                     <div class='custom-file'>
                                         <input id='image-upload' type='file' class='custom-file-input' name='images' accept='image/jpeg,image/png' multiple>
-                                        <label id='image-label' class='custom-file-label pr-5' for='inputGroupFile01'>Choose images</label>
+                                        <label id='image-label' class='custom-file-label pr-5' for='image-upload'>Choose images</label>
                                     </div>
                                 </div>
-                                <button id='mag-button' type='button' class='btn btn-secondary dropdown-toggle mt-3' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Magnification Level: 4X</button>
-                                <input id='mag-input' type='hidden' name='mag-level' value='4X' />
-                                <div id='mag-dropdown' class='dropdown-menu'>
-                                    <a id='4x' class='dropdown-item' href='#'>4X</a>
-                                    <a id='10x' class='dropdown-item' href='#'>10X</a>
-                                </div>
+                                <input id='img-mag-input' type='hidden' name='mag-level' value='4X' />
                             </form>
                         </div>
                     </div>
@@ -56,19 +51,39 @@
                 <div class='col-6 text-center'>
                     <div class='card'>
                         <div class='card-header'><h2 class='mb-0'>Upload Video</h2></div>
-                        <div class='card-body'>
-                            <form action='/uploadVideo' method='post' enctype='multipart/form-data'>
-                                <div class='custom-file'>
-                                    <input type='file' class='custom-file-input' name='video' accept='video/mp4'>
-                                    <label class='custom-file-label' for='inputGroupFile01'>Choose file</label>
+                        <div id="video-holder" class='card-body'>
+                            <img id='video-placeholder' class='d-block w-100' src='/resources/imgs/no-video.jpg' alt='No Video'/>
+                            <video class='d-none w-100' width='640' controls>
+                                <source id='video-src' src=''>
+                                    Your browser does not support HTML5 video.
+                            </video>
+                            <form id='video-form' action='/uploadVideo' method='post' enctype='multipart/form-data'>
+                                <div class='input-group'>
+                                    <div class='input-group-prepend'>
+                                        <button class='btn btn-danger cancel-btn' type='button' id='cancel-video' disabled>Cancel</button>
+                                    </div>
+                                    <div class='custom-file'>
+                                        <input id='video-upload' type='file' class='custom-file-input' name='video' accept='video/mp4'>
+                                        <label id='video-label' class='custom-file-label pr-5' for='video-upload'>Choose video</label>
+                                    </div>
                                 </div>
+                                <input id='video-mag-input' type='hidden' name='mag-level' value='4X' />
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class='row mt-3'>
-                <div class='col-6 offset-3 mb-3'>
+            <div class='row my-3'>
+                <div class='col-6 offset-3 text-center'>
+                    <button id='mag-button' type='button' class='btn btn-secondary dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Magnification Level: 4X</button>
+                    <div id='mag-dropdown' class='dropdown-menu'>
+                        <a id='4x' class='dropdown-item' href='#'>4X</a>
+                        <a id='10x' class='dropdown-item' href='#'>10X</a>
+                    </div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-6 offset-3 my-3'>
                     <button id='submit' class='btn btn-primary btn-lg btn-block' disabled>Upload</button>
                 </div>
             </div>

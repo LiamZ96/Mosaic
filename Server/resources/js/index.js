@@ -2,22 +2,33 @@
 $(document).ready(function() {
     let submit = $('#submit'),
         imageForm = $('#image-form'),
+        videoForm = $('#video-form'),
         cancelImages = $('#cancel-images'),
+        cancelVideo = $('#cancel-video'),
         imageUpload = $('#image-upload'),
+        videoUpload = $('#video-upload'),
+        videoSource = $('#video-src')
         magBtn = $('#mag-button'),
-        magInput = $('#mag-input'),
+        imgMagInput = $('#img-mag-input'),
+        videoMagInput = $('#video-mag-input'),
         fourMagSelect = $('#4x'),
         tenMagSelect = $('#10x'),
         slideHolder = $('#slide-holder'),
+        videoHolder = $('#video-holder'),
         alertContainer = $('#alert-container'),
         overlay = $('#overlay'),
-        formatTimeout,
-        postTimeout;
+        timeoutMgr = {
+            imgFormatTimeout: null,
+            videoFormatTimeout: null,
+            postTimeout: null,
+        }
+        prevSrc = null;
     
-    imageUpload.change(function() {
+    imageUpload.change(function(e) {
         let invalidFiles;
 
-        cancelImages.click();
+        cancelImagePreview();
+        cancelVideo.click();
 
         invalidFiles = Array.from(this.files).filter(function(file) {
             return !(file.name.endsWith('.jpg') || file.name.endsWith('.jpeg'));
@@ -48,7 +59,7 @@ $(document).ready(function() {
                             
                     if (idx === 0) {
                         carouselItem.addClass('active');
-                        $('#placeholder').parent().remove()
+                        $('#img-placeholder').parent().remove()
                     }
                     
                     caption.append(captionText);
@@ -62,28 +73,125 @@ $(document).ready(function() {
             });
         }
         else if (invalidFiles.length > 0) {
-            let alert = formatTimeout ? $('#img-alert') : $('<div id="img-alert" class="alert alert-danger my-3" role="alert"><strong>Error</strong> Only files of format .jpg and .jpeg are allowed</div>');
-
+            createAlert('img-alert', 'Only image files of format .jpg and .jpeg are allowed', 'imgFormatTimeout');
             this.value = null;
+        }
+    });
 
-            if (formatTimeout) {
-                clearTimeout(formatTimeout);
+    videoUpload.change(function(e) {
+        cancelImages.click();
+
+        if (this.files[0].name.endsWith('.mp4')) {
+            videoSource[0].src = URL.createObjectURL(this.files[0]);
+            videoSource.parent()[0].load();
+            videoSource.parent().removeClass('d-none');
+            videoUpload.parent().parent().addClass('selected-vid');
+
+            if ($('#video-placeholder')) {
+                $('#video-placeholder').remove();
+                prevSrc = videoSource[0].src;
             }
             else {
-                alertContainer.prepend(alert);
+                URL.revokeObjectURL(prevSrc);
             }
+            
+            $('#video-label').text(this.files[0].name);
 
-            window.scrollTo(0, 0);
+            cancelVideo.prop('disabled', false);
+            submit.prop('disabled', false);
+        }
+        else {
+            createAlert('video-alert', 'Only video files of format .mp4 are allowed', 'videoFormatTimeout');
+            this.value = null;
+        }
+    });
 
-            formatTimeout = setTimeout(function() {
-                alert.remove();
-                formatTimeout = null;
-            }, 15000);
+    cancelVideo.click(function() {
+        if (videoUpload.val() != null && videoUpload.val() !== '') {
+            let placeholder = $('<img id="video-placeholder" class="d-block w-100" src="/resources/imgs/no-video.jpg" alt="No Video"/>');
+        
+            cancelVideo.prop('disabled', true);
+            submit.prop('disabled', true);
+            $('#video-label').text('Choose video');
+        
+            URL.revokeObjectURL(videoSource[0].src);
+            videoSource[0].src = '';
+            videoSource.parent()[0].load();
+            videoSource.parent().addClass('d-none');
+            videoUpload.parent().parent().removeClass('selected-vid');
+            videoUpload.val(null);
+
+            videoHolder.prepend(placeholder);
         }
     });
     
     cancelImages.click(function() {
-        let placeholder = $('<div class="carousel-item active"><img id="placeholder" class="d-block w-100" src="/resources/imgs/no-slides.jpg" alt="No Slides"></div>');
+        cancelImagePreview();
+        imageUpload.val(null);
+    });
+    
+    submit.click(function() {
+        let data = imageUpload.val() != null || imageUpload.val() !== '' ? new FormData(imageForm[0]) : new FormData(videoForm[0]);
+
+        overlay.removeClass('d-none');
+
+        $.ajax({
+            method: 'POST',
+            url: imageUpload.val() != null || imageUpload.val() !== '' ? '/uploadImages' : '/uploadVideo',
+            enctype: 'multipart/form-data',
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false
+        })
+        .done(function(e) {
+            if (e.status === 0) {
+                // TODO: Add in location of next view
+                window.location.replace('nextView');
+            }
+            else {
+                postFail();
+            }
+        })
+        .fail(postFail)
+    });
+    
+    fourMagSelect.click(function(e) {
+        e.preventDefault();
+
+        imgMagInput.val('4x');
+        videoMagInput.val('4x');
+        magBtn.text('Magnification Level: 4X');
+    });
+
+    tenMagSelect.click(function(e) {
+        e.preventDefault();
+
+        imgMagInput.val('10x');
+        videoMagInput.val('10x');
+        magBtn.text('Magnification Level: 10X');
+    });
+
+    function createAlert(id, msg, mgrId) {
+        let alert = timeoutMgr[mgrId] ? $('#' + id) : $('<div id=' + id + ' class="alert alert-danger my-3" role="alert"><strong>Error</strong> ' + msg + '</div>');
+
+        if (timeoutMgr[mgrId]) {
+            clearTimeout(timeoutMgr[mgrId]);
+        }
+        else {
+            alertContainer.prepend(alert);
+        }
+
+        window.scrollTo(0, 0);
+
+        timeoutMgr[mgrId] = setTimeout(function() {
+            alert.remove();
+            timeoutMgr[mgrId] = null;
+        }, 15000);
+    }
+
+    function cancelImagePreview() {
+        let placeholder = $('<div class="carousel-item active"><img id="img-placeholder" class="d-block w-100" src="/resources/imgs/no-slides.jpg" alt="No Slides"></div>');
     
         cancelImages.prop('disabled', true);
         submit.prop('disabled', true);
@@ -97,65 +205,10 @@ $(document).ready(function() {
     
         placeholder.addClass('active');
         slideHolder.append(placeholder);
-    });
-    
-    submit.click(function() {
-        let data = new FormData(imageForm[0]);
-
-        overlay.removeClass("d-none");
-
-        $.ajax({
-            method: 'POST',
-            url: '/uploadImages',
-            enctype: "multipart/form-data",
-            data: data,
-            cache: false,
-            contentType: false,
-            processData: false
-        })
-        .done(function(e) {
-            if (e.status === 0) {
-                // TODO: Add in location of next view
-                window.location.replace("nextView");
-            }
-            else {
-                postFail();
-            }
-        })
-        .fail(postFail)
-    });
-    
-    fourMagSelect.click(function(e) {
-        e.preventDefault();
-
-        magInput.value = "4x";
-        magBtn.text("Magnification Level: 4X");
-    });
-
-    tenMagSelect.click(function(e) {
-        e.preventDefault();
-
-        magInput.value = "10x";
-        magBtn.text("Magnification Level: 10X");
-    });
+    }
 
     function postFail(e) {
-        let alert = postTimeout ? $('#post-alert') : $('<div id="post-alert" class="alert alert-danger my-3" role="alert"><strong>Error</strong> An error occured while uploading images, please try again later.</div>');
-
-        overlay.addClass("d-none");
-
-        if (postTimeout) {
-            clearTimeout(postTimeout);
-        }
-        else {
-            alertContainer.prepend(alert);
-        }
-
-        window.scrollTo(0, 0);
-
-        postTimeout = setTimeout(function() {
-            alert.remove();
-            postTimeout = null;
-        }, 15000);
+        overlay.addClass('d-none');
+        createAlert('post-alert', 'An error occured while uploading your files, please try again later.', 'postTimeout');
     }
 });
