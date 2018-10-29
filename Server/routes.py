@@ -20,7 +20,7 @@ def isFileAllowed(filename, extensionList):
 
 def setupUploadDir():
     # create new folder to hold users data for run
-    uploadDir = './Server/resources/uploads'
+    uploadDir = 'Server/resources/uploads'
     now = datetime.datetime.now()
     newFolder = now.strftime("%Y-%m-%dT%H_%M_%S")
     newDir = uploadDir + "/" + newFolder
