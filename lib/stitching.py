@@ -30,13 +30,8 @@ class Stitching:
 
 		if status == cv2.STITCHER_OK:
 			# Get results directory 
-<<<<<<< HEAD
-			resultsDir = os.path.join(os.path.dirname(__file__), "..", "results")
-			imagePath = os.path.join(resultsDir, "stitched_image.png")
-=======
 			#resultsDir = os.path.join(os.path.dirname(__file__), "..", "results")
 			imagePath = os.path.join(resultsDir, "stiched_image.jpg")
->>>>>>> j_stitching
 
 			# Check if results directory exist, if not create it
 			if not os.path.exists(resultsDir):
