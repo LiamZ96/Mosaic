@@ -16,6 +16,7 @@ class Stitching:
 		self.pSize = 800
 		self.eThresh = 0
 		self.resultsDirectory =""
+		self.wtak = 0
 		
 
 	"""
@@ -48,7 +49,7 @@ class Stitching:
 		Description: a function for creating a stitched image from unordered images.
 		@return A stitched image.
 	"""
-	def collage(self,temp_path):
+	def collage(self,temp_path,file_name):
 		images = []
 		for file in os.listdir(temp_path):
 			if(file.find('jpg') != -1 or file.find('JPG') != -1):
@@ -64,11 +65,13 @@ class Stitching:
   			new_im.paste(im, (x_offset,0))
   			x_offset += im.size[0]
 		
-		new_im.save(self.resultsDirectory + 'map.jpg')
+		new_im.save(self.resultsDirectory + file_name)
 		shutil.rmtree(temp_path)
 
 
 	def twoRoundStitch(self):
+		#first we run the two rounds with WTA_K set to 4
+		self.wtak = 4
 		completed_images = []
 		print("begin first round")
 		temp_dir = str(int(round(time.time())))
@@ -88,14 +91,41 @@ class Stitching:
 		for img in final_images:
 			cv2.imwrite(str(temp_dir) + str(img_number) + ".jpg",img)
 			img_number +=1
-		self.collage(temp_dir)
+		self.collage(temp_dir,"resultA.jpg")
+
+		#now we run two round again but with WTA_K set to 2
+		self.setDirectory(self.sourceDirectory)
+		self.wtak = 2
+		completed_images = []
+		print("begin first round")
+		temp_dir = str(int(round(time.time())))
+		temp_dir = temp_dir + "/"
+		os.makedirs(temp_dir)
+		self.pSize = 1000
+		self.eThresh = 0
+		first_round = []
+		first_round = self.stitchUnorderedImages()
+		self.images = [] #reset self.images to empty
+		self.images = first_round
+		self.pSize=200
+		self.eThresh=200
+		print("begin second round")
+		final_images = self.stitchUnorderedImages()
+		img_number =0
+		for img in final_images:
+			cv2.imwrite(str(temp_dir) + str(img_number) + ".jpg",img)
+			img_number +=1
+		self.collage(temp_dir,"resultB.jpg")
 
 	def stitchUnorderedImages(self):
 		#if not os.path.exists(self.resultsDirectory):
 		#	os.makedirs(self.resultsDirectory)
 
-		orb = cv2.ORB_create(WTA_K=4, scaleFactor=1.1,patchSize=self.pSize,edgeThreshold=self.eThresh)
-		bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
+		orb = cv2.ORB_create(WTA_K=self.wtak, scaleFactor=1.1,patchSize=self.pSize,edgeThreshold=self.eThresh)
+		if(self.wtak == 4):
+			bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
+		else:
+			bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 		kpMap = {}
 		matchLevel = 0
 		matchThreshold =15
@@ -188,6 +218,7 @@ class Stitching:
 		self.sourceDirectory = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", path))
 
 		# Read images and append to image array
+		self.images = []
 		for file in os.listdir(self.sourceDirectory):
 			if(file.find('jpg') != -1 or file.find('JPG') != -1):
 				self.images.append(cv2.imread(os.path.join(self.sourceDirectory, file), cv2.IMREAD_COLOR))
@@ -196,9 +227,15 @@ class Stitching:
 		#print(firstImage, secondImage)
 		# Create stitcher and stitch images
 		stitcher = cv2.createStitcher()
-		orb = cv2.ORB_create(WTA_K=4, scaleFactor=1.1,patchSize=self.pSize, edgeThreshold=self.eThresh)
-		bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
-		status, image = stitcher.stitch([firstImage[2], secondImage[2]])
+		orb = cv2.ORB_create(WTA_K=self.wtak, scaleFactor=1.1,patchSize=self.pSize, edgeThreshold=self.eThresh)
+		if(self.wtak == 4):
+			bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
+		else:
+			bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+		try:
+			status, image = stitcher.stitch([firstImage[2], secondImage[2]])
+		except:
+			return(firstImage,secondImage)
 		kp, desc = orb.detectAndCompute(image, None)
 
 		#print(status)
