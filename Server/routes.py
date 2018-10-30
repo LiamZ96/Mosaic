@@ -1,5 +1,5 @@
 from . import app
-from flask import render_template, send_from_directory, request, url_for, redirect
+from flask import render_template, send_from_directory, request, url_for, redirect, jsonify
 from werkzeug.utils import secure_filename
 from lib.counting import *
 from lib.stitching import *
@@ -21,7 +21,7 @@ def isFileAllowed(filename, extensionList):
 
 def setupUploadDir():
     # create new folder to hold users data for run
-    uploadDir = './Server/resources/uploads'
+    uploadDir = 'Server/resources/uploads'
     now = datetime.datetime.now()
     newFolder = now.strftime("%Y-%m-%dT%H-%M-%S")
     newDir = uploadDir + "/" + newFolder
@@ -50,14 +50,14 @@ def error():
 @app.route('/uploadImages', methods=["POST"])
 def uploadImages(): 
     images = request.files.getlist("images")
-    magLevel = request.form["magLevel"]
+    magLevel = request.form["mag-level"]
 
     newDir = setupUploadDir()
 
     for i in images: 
         #redirect to error page if the image is in an unacceptable
         if(isFileAllowed(i.filename,ALLOWED_IMAGE_EXTENSIONS) == False): 
-            return redirect(url_for('error',errorMessage="One or more of the images that were uploaded are in the incorrect format. Accepted formats: "+(", ".join(ALLOWED_IMAGE_EXTENSIONS))))
+            return jsonify({"status": 1, "msg": "One or more of the images that were uploaded are in the incorrect format. Accepted formats: "+(", ".join(ALLOWED_IMAGE_EXTENSIONS))})
 
         print("Image is permitted: "+str(isFileAllowed(i.filename,ALLOWED_IMAGE_EXTENSIONS))) #see if the image format is allowed
         print("Secure filename: "+str(secure_filename(i.filename))) #escape the filename
@@ -65,7 +65,9 @@ def uploadImages():
         imgPath = newDir + "/images/" + str(secure_filename(i.filename))
         i.save(imgPath)
     
-    return redirect('/getStitchedImage/' + newDir.split('/')[-1]) #redirect to homepage
+
+    #TODO: return location of the directory to the user
+    return jsonify({"status": 0, "msg": "Success","location": newDir.replace("Server/resources/uploads","")}) #redirect to homepage
 
 @app.route('/uploadVideo', methods=["POST"])
 def uploadVideo(): 
@@ -75,7 +77,7 @@ def uploadVideo():
 
     #redirect to the error page if the video is not the correct format
     if(isFileAllowed(video.filename,ALLOWED_VIDEO_EXTENSIONS) == False):
-        return redirect(url_for('error',errorMessage="The uploaded video is in the incorrect format. Accepted formats: "+(", ".join(ALLOWED_VIDEO_EXTENSIONS))))
+        return jsonify({"status": 1, "msg": "The uploaded video is in the incorrect format. Accepted formats: "+(", ".join(ALLOWED_VIDEO_EXTENSIONS))})
 
     print("Video is permitted: "+str(isFileAllowed(video.filename,ALLOWED_VIDEO_EXTENSIONS))) #see if the image format is allowed
     print("Secure filename: "+str(secure_filename(video.filename))) #escape the filename
@@ -83,7 +85,8 @@ def uploadVideo():
     # place video in a unique directory
     vidPath = newDir + "/videos/" + str(secure_filename(video.filename))
     video.save(vidPath)
-    return redirect(url_for('index')) #redirect to homepage
+    return jsonify({"status": 0, "msg": "Success"}) #redirect to homepage
+
 
 # accepts a path to the image directory to use for stitching
 @app.route('/getStitchedImage/<path:directory>')
@@ -91,6 +94,7 @@ def getStitchedImage(directory):
     dirPrefix="Server/resources/uploads/"
     stitcher = Stitching()
     stitcher.setDirectory(dirPrefix + directory + "/images")
+    stitcher.setResultsDirectory(dirPrefix + directory + "/maps")
 
     imageMap = stitcher.twoRoundStitch()
     numFiles = len([name for name in os.listdir(dirPrefix+directory+"/maps")]) + 1
@@ -99,25 +103,23 @@ def getStitchedImage(directory):
 # accepts a path to the stitched image directory
 @app.route('/getResults/<path:directory>')
 def getResults(directory): 
-    results = ""
-    directory = 'Server/resources/uploads/' + directory
-    results = directory + '/results/'
-    for file in results:
-        filePath = os.path.join(results, file)
-        try:
-            if os.path.isfile(filePath):
-                os.unlink(filePath)
-        except Exception as e:
-            print(e)
-    directory += '/maps/'
-    valid = 0
-    water = 0
-    images = [file for file in os.listdir(directory) if os.path.isfile((directory+file))]
-    for image in images:
-        count = Counting(directory+image)
-        circles = count.getColorBeads(HoughConfig.OBJX10)
-        results += "Valid beads: " + str(len(circles))
-        valid += len(circles)
-        results += "\n" + "Water beads: " + str(len(count.waterBeads)) +'\n'
-        water += len(count.waterBeads)
+    directory = 'Server/resources/uploads/' + directory+"/maps/resultA.jpg"
+    print(directory)
+    # results = directory + '/results/'
+    # for file in results:
+    #     filePath = os.path.join(results, file)
+    #     try:
+    #         if os.path.isfile(filePath):
+    #             os.unlink(filePath)
+    #     except Exception as e:
+    #         print(e)
+    # directory += '/maps/'
+    # valid = 0
+    # water = 0
+    # images = [file for file in os.listdir(directory) if os.path.isfile((directory+file))]
+    # for image in images:
+    count = Counting(directory)
+    circles = count.getColorBeads(HoughConfig.OBJX4)
+    valid = len(circles)
+    water = len(count.waterBeads)
     return render_template('results.html', numImages = len(images),validBeads=valid, waterBeads=water) 
