@@ -11,18 +11,15 @@ def printCircles(counter,circles):
     print("---------------------------------------------------------------------------")
 
 def main():
-    stitcher = Stitching()
-    stitcher.setDirectory("test/resources/sample2")
-    imageMap = stitcher.stitchUnorderedImages()
 
     # 4x demo 
-    count = Counting("./test/resources/sampleMaps/map.png")
+    count = Counting("./test/resources/sampleMaps/resultsmap.jpg")
     circles = count.getColorBeads(HoughConfig.OBJX4)
     printCircles(count,circles)
     
     # 10x demo 
-    count = Counting("./test/resources/sampleMaps/map_10x.jpg")
-    circles = count.getColorBeads(HoughConfig.OBJX10)
+    count = Counting("./test/resources/sampleMaps/bluemap.jpg")
+    circles = count.getColorBeads(HoughConfig.OBJX4)
     printCircles(count,circles)
 
 if __name__ == "__main__":

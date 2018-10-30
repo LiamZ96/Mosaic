@@ -94,32 +94,18 @@ def getStitchedImage(directory):
     dirPrefix="Server/resources/uploads/"
     stitcher = Stitching()
     stitcher.setDirectory(dirPrefix + directory + "/images")
-    stitcher.setResultsDirectory(dirPrefix + directory + "/maps")
+    stitcher.setResultsDirectory(dirPrefix + directory + "/maps/")
 
-    imageMap = stitcher.twoRoundStitch()
+    stitcher.twoRoundStitch()
     numFiles = len([name for name in os.listdir(dirPrefix+directory+"/maps")]) + 1
-    return render_template('stitched.html', numFiles=numFiles)
+    return render_template('stitched.html', numFiles=numFiles, direct=directory)
 
 # accepts a path to the stitched image directory
 @app.route('/getResults/<path:directory>')
 def getResults(directory): 
-    directory = 'Server/resources/uploads/' + directory+"/maps/resultA.jpg"
-    print(directory)
-    # results = directory + '/results/'
-    # for file in results:
-    #     filePath = os.path.join(results, file)
-    #     try:
-    #         if os.path.isfile(filePath):
-    #             os.unlink(filePath)
-    #     except Exception as e:
-    #         print(e)
-    # directory += '/maps/'
-    # valid = 0
-    # water = 0
-    # images = [file for file in os.listdir(directory) if os.path.isfile((directory+file))]
-    # for image in images:
+    directory = 'Server/resources/uploads/' + directory
     count = Counting(directory)
     circles = count.getColorBeads(HoughConfig.OBJX4)
     valid = len(circles)
     water = len(count.waterBeads)
-    return render_template('results.html', numImages = len(images),validBeads=valid, waterBeads=water) 
+    return render_template('results.html',validBeads=valid, waterBeads=water) 
