@@ -5,6 +5,7 @@ from lib.counting import *
 from lib.stitching import *
 import os
 import datetime
+import json
 from PIL import Image
 
 ALLOWED_IMAGE_EXTENSIONS = set(['jpg', 'jpeg'])
@@ -108,4 +109,9 @@ def getResults(directory):
     circles = count.getColorBeads(HoughConfig.OBJX4)
     valid = len(circles)
     water = len(count.waterBeads)
-    return render_template('results.html',validBeads=valid, waterBeads=water) 
+    return render_template('results.html', validBeads=valid, waterBeads=water, circles=json.dumps(circles)) 
+
+# @app.route('/getResults/<path:directory>')
+# def api_info():
+    
+#     return jsonify('hey')

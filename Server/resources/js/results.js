@@ -1,5 +1,101 @@
-'use-strict';
-$(window).bind("load", function(){
+'use strict';
+
+$(window).ready(function(){
+
+	let rgbToHex = function (rgb) { 
+		var hex = Number(rgb).toString(16);
+		if (hex.length < 2) {
+			 hex = "0" + hex;
+		}
+		return hex;
+	  };
+
+	  let fullColorHex = function(r,g,b) {   
+		var red = rgbToHex(r);
+		var green = rgbToHex(g);
+		var blue = rgbToHex(b);
+		return '#' + red+green+blue;
+	  };
+
+
+	console.log(circles);
+	let colorAry = [];
+
+	
+	//CanvasJS.addColorSet("red", ['#8F1500']);
+	CanvasJS.addColorSet("green", ['#007F00']);
+	CanvasJS.addColorSet("blue", ['#1034A6']);
+
+	let red = [],
+		green = [],
+		blue = [],
+		i = 0;		
+		
+	for (var key in circles) {
+		var redBeadData = {},
+			greenBeadData = {},
+			blueBeadData = {};
+		redBeadData.label = i;
+		greenBeadData.label = i;
+		blueBeadData.label = i;
+		redBeadData.y = circles[i][0][0];
+		greenBeadData.y = circles[i][0][1];
+		blueBeadData.y = circles[i][0][2];
+		red.push(redBeadData);
+		green.push(greenBeadData);
+		blue.push(blueBeadData);
+		colorAry.push(fullColorHex(Math.round(circles[i][0][0]), Math.round(circles[i][0][1]), Math.round(circles[i][0][2])));
+		i++;
+	};
+
+	CanvasJS.addColorSet("red", colorAry);
+	console.log(colorAry);
+
+	var redChart = {
+		colorSet: "red",
+		title: {
+			text: "R-Values"              
+		},
+		data: [              
+		{
+			// Change type to "doughnut", "line", "splineArea", etc.
+			type: "column",
+			dataPoints: red
+		}
+		]
+	};
+	var greenChart = {
+		colorSet: "red",
+		title: {
+			text: "G-Values"              
+		},
+		data: [              
+		{
+			// Change type to "doughnut", "line", "splineArea", etc.
+			type: "column",
+			dataPoints: green
+		}
+		]
+	};
+	var blueChart = {
+		colorSet: "red",
+		title: {
+			text: "B-Values"              
+		},
+		data: [              
+		{
+			// Change type to "doughnut", "line", "splineArea", etc.
+			type: "column",
+			dataPoints: blue
+		}
+		]
+	};
+
+	$("#redChart").CanvasJSChart(redChart);
+	$("#greenChart").CanvasJSChart(greenChart);
+	$("#blueChart").CanvasJSChart(blueChart);
+
+
 	var addImages = function(){
 		
 		let address = $(location).attr('href'),
@@ -25,5 +121,7 @@ $(window).bind("load", function(){
 			}
 		}
 	};
+
+
 	addImages().done(shrinkImages());
 });
