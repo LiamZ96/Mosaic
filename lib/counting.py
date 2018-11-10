@@ -224,7 +224,7 @@ class Counting:
 
         average = (round(np.mean(reds), 2), round(np.mean(greens), 2), round(np.mean(blues), 2))
         isWater = self.isWater(average)
-        return [average, isWater]
+        return [[average[0],average[1],average[2]], isWater, [circleInfo[0],[1],[2]]] #[[R,G,B], isWater, [x,y,radius]]
 
 
     """
