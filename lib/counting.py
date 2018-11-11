@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 import random
 import math
 import itertools
+import csv
 from enum import Enum
 from os import listdir, path
 
@@ -66,8 +67,11 @@ class Counting:
         fileNum = len(images)
         imagePath += 'result_image' + str(fileNum) +'.jpg'
         cv2.imwrite(imagePath, cimg)
+
+        print(self.colorBeads)
+        self.getBeadsCSV()
         return result 
-        
+
     """
         Description: a function that takes a cicle's RGB values and returns if it is water or not
         @param RGB - tuple containing the average red, green, and blue values of a circle
@@ -241,3 +245,28 @@ class Counting:
             # x and y given here were assuming that the center was at 0,0 therefore you must add the actual center coordinates to give accurate ones back
             yield from set((( centerX + x, centerY + y), (centerX + x, centerY -y), (centerX -x, centerY + y), (centerX -x, centerY -y),))
                     
+
+    """
+        Description: 
+        @param 
+        @param
+        @param 
+        @return 
+    """ 
+    def getBeadsCSV(self):
+        # TODO : put the csv file in the proper folder
+        with open('beads.csv', mode='w') as beadFile:
+            writer = csv.writer(beadFile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            colNames = ['Bead Number', 'Red Val', 'Green Val', 'Blue Val']
+            writer.writerow(colNames)
+            i = 1
+            for bead in self.colorBeads:
+                r = bead[0][0]
+                g = bead[0][1]
+                b = bead[0][2]
+                if bead[1] == False:
+                    beadNum = i
+                else:
+                    beadNum = 0
+                writer.writerow([beadNum, r, g, b])
+                i += 1
