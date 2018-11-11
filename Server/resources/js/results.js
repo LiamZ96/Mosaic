@@ -2,6 +2,60 @@
 
 $(window).ready(function(){
 
+	let beadTableDiv = document.getElementById('resultsDiv'),
+		table = document.createElement('table'),
+		tableHeader = document.createElement('thead'),
+		tableHeaderRow = document.createElement('tr'),
+		beadNumberHeader = document.createElement('td'),
+		rValueHeader = document.createElement('td'),
+		gValueHeader = document.createElement('td'),
+		bValueHeader = document.createElement('td'),
+		j = 0;
+
+	table.className = 'table table-sm';
+	beadNumberHeader.innerText = '#';
+	rValueHeader.innerText = 'R';
+	gValueHeader.innerText = 'G';
+	bValueHeader.innerText = 'B';	
+
+	beadNumberHeader.scope = 'col';
+	rValueHeader.scope = 'col';
+	gValueHeader.scope = 'col';
+	bValueHeader.scope = 'col';	
+
+	tableHeaderRow.appendChild(beadNumberHeader);
+	tableHeaderRow.appendChild(rValueHeader);
+	tableHeaderRow.appendChild(gValueHeader);
+	tableHeaderRow.appendChild(bValueHeader);
+	tableHeader.appendChild(tableHeaderRow);
+	table.appendChild(tableHeader);
+		
+	for (var key in circles) {
+		let newRow = document.createElement('tr'),
+			beadNumber = document.createElement('td'),
+			bead_r_value = document.createElement('td'),
+			bead_g_value = document.createElement('td'),
+			bead_b_value = document.createElement('td');
+
+			beadNumber.innerText = j + 1;
+			bead_r_value.innerText = Math.round(circles[j][0][0]);
+			bead_g_value.innerText = Math.round(circles[j][0][1]);
+			bead_b_value.innerText = Math.round(circles[j][0][2]);
+
+			newRow.appendChild(beadNumber);
+			newRow.appendChild(bead_r_value);
+			newRow.appendChild(bead_g_value);
+			newRow.appendChild(bead_b_value);
+
+			table.appendChild(newRow);
+
+			j++;
+	}
+
+	document.getElementsByClassName('container')[0].replaceChild(table, beadTableDiv);
+
+
+
 	let rgbToHex = function (rgb) { 
 		var hex = Number(rgb).toString(16);
 		if (hex.length < 2) {
