@@ -27,7 +27,7 @@ $(window).ready(function(){
             bead = bead[2];
             var x = translateCoord(bead[0],imageObj.width,width),
                 y = translateCoord(bead[1],imageObj.height,height),
-                radius = bead[2]/4;
+                radius = bead[2]/4; //TODO: translate this radius like the x,y
             ctx.beginPath();
             ctx.arc(x,y,radius,0,2*Math.PI);
             ctx.strokeStyle="red";
