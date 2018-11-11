@@ -50,9 +50,9 @@ class Counting:
         for i in circles[0,:]:
             # i[0] is x coordinate, i[1] is y coordinate, i[2] is radius
             # draw the outer circle
-            cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
+            #cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
             # draw the center of the circle
-            cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
+            #cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
 
             color = self.getBrightestColor(i)
             if(color[1] == False): # if the bead is a water bead, leave it out.
@@ -60,7 +60,7 @@ class Counting:
                 result.append(color)
             else: 
                 self.waterBeads.append(color)
-        
+        #plt.imshow(cimg),plt.show()
         imagePath = '/'.join(self.imagePath.split('/')[:-2]) + '/results/'
         images = [file for file in listdir(imagePath) if path.isfile((imagePath+file))]
         fileNum = len(images)
@@ -224,7 +224,7 @@ class Counting:
 
         average = (round(np.mean(reds), 2), round(np.mean(greens), 2), round(np.mean(blues), 2))
         isWater = self.isWater(average)
-        return [[average[0],average[1],average[2]], isWater, [circleInfo[0],[1],[2]]] #[[R,G,B], isWater, [x,y,radius]]
+        return [[average[0],average[1],average[2]], isWater, [circleInfo[0],circleInfo[1],circleInfo[2]]] #[[R,G,B], isWater, [x,y,radius]]
 
 
     """
