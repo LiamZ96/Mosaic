@@ -187,7 +187,7 @@ class Counting:
                     and returns a list containing tuple with the bead's average RGB values of the top 10% and boolean isWater
         @param circleInfo - array that contains a circle's x and y coordinates of the center and the radius of the circle
         @param imageMap - a map (image) of the microscope images in color.
-        @return a list containing tuple with average RGB values of top 10% from bead and boolean isWater
+        @return a list containing tuple with average RGB values of top 10% from bead, boolean isWater, and x,y,radius value of the bead.
     """        
     def getBrightestColor(self, circleInfo):
         img = self.colorMap
