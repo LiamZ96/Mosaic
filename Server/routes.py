@@ -103,9 +103,7 @@ def getStitchedImage(directory):
 # accepts a path to the stitched image directory
 @app.route('/getResults/<path:directory>')
 def getResults(directory): 
-    directory = 'Server/resources/uploads/' + directory
-    count = Counting(directory)
+    serverDirectory = 'Server/resources/uploads/' + directory
+    count = Counting(serverDirectory)
     circles = count.getColorBeads(HoughConfig.OBJX4)
-    valid = len(circles)
-    water = len(count.waterBeads)
-    return render_template('results.html',validBeads=valid, waterBeads=water) 
+    return render_template('results.html',colorBeads=circles,waterBeads=count.waterBeads, mapLocation=directory) 
