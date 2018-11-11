@@ -6,10 +6,10 @@ $(window).ready(function(){
 		table = document.createElement('table'),
 		tableHeader = document.createElement('thead'),
 		tableHeaderRow = document.createElement('tr'),
-		beadNumberHeader = document.createElement('td'),
-		rValueHeader = document.createElement('td'),
-		gValueHeader = document.createElement('td'),
-		bValueHeader = document.createElement('td'),
+		beadNumberHeader = document.createElement('th'),
+		rValueHeader = document.createElement('th'),
+		gValueHeader = document.createElement('th'),
+		bValueHeader = document.createElement('th'),
 		j = 0;
 
 	table.className = 'table table-sm';
@@ -18,10 +18,10 @@ $(window).ready(function(){
 	gValueHeader.innerText = 'G';
 	bValueHeader.innerText = 'B';	
 
-	beadNumberHeader.scope = 'col';
-	rValueHeader.scope = 'col';
-	gValueHeader.scope = 'col';
-	bValueHeader.scope = 'col';	
+	beadNumberHeader.setAttribute("scope", "col");
+	rValueHeader.setAttribute("scope", "col");
+	gValueHeader.setAttribute("scope", "col");
+	bValueHeader.setAttribute("scope", "col");	
 
 	tableHeaderRow.appendChild(beadNumberHeader);
 	tableHeaderRow.appendChild(rValueHeader);
@@ -32,11 +32,12 @@ $(window).ready(function(){
 		
 	for (var key in circles) {
 		let newRow = document.createElement('tr'),
-			beadNumber = document.createElement('td'),
+			beadNumber = document.createElement('th'),
 			bead_r_value = document.createElement('td'),
 			bead_g_value = document.createElement('td'),
 			bead_b_value = document.createElement('td');
 
+			beadNumber.setAttribute("scope", "row");
 			beadNumber.innerText = j + 1;
 			bead_r_value.innerText = Math.round(circles[j][0][0]);
 			bead_g_value.innerText = Math.round(circles[j][0][1]);
