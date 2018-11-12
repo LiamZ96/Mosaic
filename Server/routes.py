@@ -5,6 +5,7 @@ from lib.counting import *
 from lib.stitching import *
 import os
 import datetime
+import json
 from PIL import Image
 
 ALLOWED_IMAGE_EXTENSIONS = set(['jpg', 'jpeg'])
