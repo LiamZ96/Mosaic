@@ -5,6 +5,7 @@ import time
 import sys
 from PIL import Image
 import shutil
+import multiprocessing as mp
 
 """
         Description: a class to deal with stitching images together and handling overlap of the images.
@@ -13,10 +14,11 @@ class Stitching:
 	def __init__(self):
 		self.images = []
 		self.sourceDirectory = ""
-		self.pSize = 800
-		self.eThresh = 0
+		#pSize = 800
+		#eThresh = 0
 		self.resultsDirectory =""
-		self.wtak = 0
+		#wtak = 0
+		self.results = []
 		
 
 	"""
@@ -59,6 +61,7 @@ class Stitching:
 		max_height = max(heights)
 
 		new_im = Image.new('RGB', (total_width, max_height))
+		
 
 		x_offset = 0
 		for im in images:
@@ -69,60 +72,96 @@ class Stitching:
 		shutil.rmtree(temp_path)
 
 
-	def twoRoundStitch(self):
+	def twoRoundStitch(self, sourceDirectory, resultsDirectory):
+		output = mp.Queue()
 		#first we run the two rounds with WTA_K set to 4
-		self.wtak = 4
+		self.resultsDirectory = resultsDirectory
+		self.setDirectory(sourceDirectory)
+		'''
+		wtak = 4
 		completed_images = []
 		print("begin first round")
 		temp_dir = str(int(round(time.time())))
 		temp_dir = temp_dir + "/"
 		os.makedirs(temp_dir)
-		self.pSize = 1000
-		self.eThresh = 0
+		pSize = 1000
+		eThresh = 0
 		first_round = []
-		first_round = self.stitchUnorderedImages()
-		self.images = [] #reset self.images to empty
-		self.images = first_round
-		self.pSize=200
-		self.eThresh=200
+		#first_round = self.stitchUnorderedImages(4,1000,0,self.images)
+		'''
+	
+		pl = mp.Pool(processes=2)
+		first_round = pl.starmap(self.stitchUnorderedImages, [(4,1000,0,self.images), (2, 1000, 0, self.images)])	
+		'''
+		processes = [mp.Process(target = self.stitchUnorderedImages, args =(4,1000,0,self.images, 0)), mp.Process(target=self.stitchUnorderedImages, args=(2, 1000, 0, self.images, 1))]
+		for p in processes:
+			p.start()
+		for p in processes:
+			p.join()
+		'''
+		final_images = pl.starmap(self.stitchUnorderedImages, [(4, 200, 200, first_round[0]), (2, 200, 200, first_round[1])])
+		
+		'''
+		processes = [mp.Process(target = self.stitchUnorderedImages, args =(4,200,200,self.results[0],2)), mp.Process(target=self.stitchUnorderedImages, args=(2, 200, 200, self.results[1],3))]
+		for p in processes:
+			p.start()
+		for p in processes:
+			p.join()
+		'''	
+
+
+		'''
+		pSize=200
+		eThresh=200
 		print("begin second round")
-		final_images = self.stitchUnorderedImages()
+		#final_images = self.stitchUnorderedImages(4, 200,200,first_round)
+		'''
+		temp_dir = str(int(round(time.time())))
+		temp_dir = temp_dir + "/"		
+		os.makedirs(temp_dir)
+
 		img_number =0
-		for img in final_images:
+		for img in final_images[0]:
 			cv2.imwrite(str(temp_dir) + str(img_number) + ".jpg",img)
 			img_number +=1
 		self.collage(temp_dir,"resultA.jpg")
 
 		#now we run two round again but with WTA_K set to 2
-		self.setDirectory(self.sourceDirectory)
-		self.wtak = 2
+		#self.setDirectory(self.sourceDirectory)
+		'''
+		wtak = 2
 		completed_images = []
 		print("begin first round")
 		temp_dir = str(int(round(time.time())))
 		temp_dir = temp_dir + "/"
 		os.makedirs(temp_dir)
-		self.pSize = 1000
-		self.eThresh = 0
+		pSize = 1000
+		eThresh = 0
 		first_round = []
-		first_round = self.stitchUnorderedImages()
-		self.images = [] #reset self.images to empty
+		first_round = self.stitchUnorderedImages(2, 1000, 0, self.images)
+		#print(len(first_round))
 		self.images = first_round
-		self.pSize=200
-		self.eThresh=200
+		pSize=200
+		eThresh=200
 		print("begin second round")
-		final_images = self.stitchUnorderedImages()
+		final_images = self.stitchUnorderedImages(2, 200, 200, first_round)
+		'''
+		temp_dir = str(int(round(time.time())))
+		temp_dir = temp_dir + "/"		
+		os.makedirs(temp_dir)
+		
 		img_number =0
-		for img in final_images:
+		for img in final_images[1]:
 			cv2.imwrite(str(temp_dir) + str(img_number) + ".jpg",img)
 			img_number +=1
 		self.collage(temp_dir,"resultB.jpg")
 
-	def stitchUnorderedImages(self):
+	def stitchUnorderedImages(self, wtak, pSize, eThresh, images):
 		#if not os.path.exists(self.resultsDirectory):
 		#	os.makedirs(self.resultsDirectory)
 
-		orb = cv2.ORB_create(WTA_K=self.wtak, scaleFactor=1.1,patchSize=self.pSize,edgeThreshold=self.eThresh)
-		if(self.wtak == 4):
+		orb = cv2.ORB_create(WTA_K=wtak, scaleFactor=1.1,patchSize=pSize,edgeThreshold=eThresh)
+		if(wtak == 4):
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
 		else:
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
@@ -183,7 +222,7 @@ class Stitching:
 			# Sort them in the order of their distance.
 			matches = sorted(bestKeyPoints[1], key = lambda x:x.distance)
 			# Stitch best matching image with parentImage
-			stitchedImg = self.__stitchImages(parentValue, bestMatch, matches)
+			stitchedImg = self.__stitchImages(parentValue, bestMatch, matches, wtak, pSize, eThresh)
 			if (len(stitchedImg) == 3):
 				kpMap[parentKey] = stitchedImg
 				matchLevel =0
@@ -218,7 +257,7 @@ class Stitching:
 		self.sourceDirectory = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", path))
 
 		# Read images and append to image array
-		self.images = []
+		
 		for file in os.listdir(self.sourceDirectory):
 			if(file.find('jpg') != -1 or file.find('JPG') != -1):
 				self.images.append(cv2.imread(os.path.join(self.sourceDirectory, file), cv2.IMREAD_COLOR))
@@ -226,12 +265,12 @@ class Stitching:
 	def setResultsDirectory(self,path):
 		self.resultsDirectory = path
 
-	def __stitchImages(self, firstImage, secondImage, matches):
+	def __stitchImages(self, firstImage, secondImage, matches, wtak, pSize, eThresh):
 		#print(firstImage, secondImage)
 		# Create stitcher and stitch images
 		stitcher = cv2.createStitcher()
-		orb = cv2.ORB_create(WTA_K=self.wtak, scaleFactor=1.1,patchSize=self.pSize, edgeThreshold=self.eThresh)
-		if(self.wtak == 4):
+		orb = cv2.ORB_create(WTA_K=wtak, scaleFactor=1.1,patchSize=pSize, edgeThreshold=eThresh)
+		if(wtak == 4):
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
 		else:
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
