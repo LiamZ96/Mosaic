@@ -110,4 +110,5 @@ def getResults(directory):
     serverDirectory = 'Server/resources/uploads/' + directory
     count = Counting(serverDirectory)
     circles = count.getColorBeads(magLevel)
+    count.makeBeadsCSV()
     return render_template('results.html',colorBeads=circles,waterBeads=count.waterBeads, mapLocation=directory) 
