@@ -3,9 +3,10 @@ import os
 from matplotlib import pyplot as plt
 import time
 import sys
-from PIL import Image
+from PIL import Image, ExifTags
 import shutil
 import multiprocessing as mp
+from collections import OrderedDict
 
 """
         Description: a class to deal with stitching images together and handling overlap of the images.
@@ -77,45 +78,15 @@ class Stitching:
 		#first we run the two rounds with WTA_K set to 4
 		self.resultsDirectory = resultsDirectory
 		self.setDirectory(sourceDirectory)
-		'''
-		wtak = 4
-		completed_images = []
-		print("begin first round")
-		temp_dir = str(int(round(time.time())))
-		temp_dir = temp_dir + "/"
-		os.makedirs(temp_dir)
-		pSize = 1000
-		eThresh = 0
-		first_round = []
-		#first_round = self.stitchUnorderedImages(4,1000,0,self.images)
-		'''
 	
 		pl = mp.Pool(processes=2)
-		first_round = pl.starmap(self.stitchUnorderedImages, [(4,1000,0,self.images), (2, 1000, 0, self.images)])	
-		'''
-		processes = [mp.Process(target = self.stitchUnorderedImages, args =(4,1000,0,self.images, 0)), mp.Process(target=self.stitchUnorderedImages, args=(2, 1000, 0, self.images, 1))]
-		for p in processes:
-			p.start()
-		for p in processes:
-			p.join()
-		'''
+		i1 = self.images
+		i2 = self.images
+		first_round = pl.starmap(self.stitchUnorderedImages, [(4,1000,0,i1), (2, 1000, 0, i2)])	
+		print(len(first_round[0]))
 		final_images = pl.starmap(self.stitchUnorderedImages, [(4, 200, 200, first_round[0]), (2, 200, 200, first_round[1])])
 		
-		'''
-		processes = [mp.Process(target = self.stitchUnorderedImages, args =(4,200,200,self.results[0],2)), mp.Process(target=self.stitchUnorderedImages, args=(2, 200, 200, self.results[1],3))]
-		for p in processes:
-			p.start()
-		for p in processes:
-			p.join()
-		'''	
-
-
-		'''
-		pSize=200
-		eThresh=200
-		print("begin second round")
-		#final_images = self.stitchUnorderedImages(4, 200,200,first_round)
-		'''
+		
 		temp_dir = str(int(round(time.time())))
 		temp_dir = temp_dir + "/"		
 		os.makedirs(temp_dir)
@@ -128,24 +99,7 @@ class Stitching:
 
 		#now we run two round again but with WTA_K set to 2
 		#self.setDirectory(self.sourceDirectory)
-		'''
-		wtak = 2
-		completed_images = []
-		print("begin first round")
-		temp_dir = str(int(round(time.time())))
-		temp_dir = temp_dir + "/"
-		os.makedirs(temp_dir)
-		pSize = 1000
-		eThresh = 0
-		first_round = []
-		first_round = self.stitchUnorderedImages(2, 1000, 0, self.images)
-		#print(len(first_round))
-		self.images = first_round
-		pSize=200
-		eThresh=200
-		print("begin second round")
-		final_images = self.stitchUnorderedImages(2, 200, 200, first_round)
-		'''
+		
 		temp_dir = str(int(round(time.time())))
 		temp_dir = temp_dir + "/"		
 		os.makedirs(temp_dir)
@@ -165,14 +119,14 @@ class Stitching:
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
 		else:
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-		kpMap = {}
+		kpMap = OrderedDict()
 		matchLevel = 0
 		matchThreshold =15
 		parentKey = None
 		completed_images = []
 		
 		# Iterate through images and detect keypoints for each image and store in dictonary
-		for idx, img in enumerate(self.images):
+		for idx, img in enumerate(images):
 			kp, desc = orb.detectAndCompute(img, None)
 			if(len(kp) > 0):
 				kpMap["image" + str(idx)] = (kp, desc, img)
@@ -188,7 +142,7 @@ class Stitching:
 			if(parentKey == None):
 				parentKey = next(iter(kpMap))
 			parentValue = kpMap[parentKey]
-			allMatches = {}
+			allMatches = OrderedDict()
 			if(matchLevel > len(kpMap)):
 				matchThreshold +=10
 			# Second Iteration to find all the matching keypoints for parentKeypoints
@@ -244,7 +198,7 @@ class Stitching:
 		# Check if results directory exist, if not create it
 		
 
-		
+		#print(len(completed_images))
 		return completed_images
 
 	"""
@@ -257,10 +211,20 @@ class Stitching:
 		self.sourceDirectory = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", path))
 
 		# Read images and append to image array
-		
-		for file in os.listdir(self.sourceDirectory):
+		current_images = {}
+		for file in os.listdir(self.sourceDirectory):			
 			if(file.find('jpg') != -1 or file.find('JPG') != -1):
-				self.images.append(cv2.imread(os.path.join(self.sourceDirectory, file), cv2.IMREAD_COLOR))
+				path = os.path.join(self.sourceDirectory, file)
+				#self.images.append(cv2.imread(path, cv2.IMREAD_COLOR))
+				img = Image.open(path)
+				exif = { ExifTags.TAGS[k]: v for k, v in img._getexif().items() if k in ExifTags.TAGS }
+				current_images[path] = exif['DateTimeOriginal']
+		sorted_by_value = sorted(current_images.items(), key=lambda kv: kv[1])
+		for key in sorted_by_value:
+			self.images.append(cv2.imread(key[0], cv2.IMREAD_COLOR))
+			
+
+		
 
 	def setResultsDirectory(self,path):
 		self.resultsDirectory = path
@@ -268,7 +232,7 @@ class Stitching:
 	def __stitchImages(self, firstImage, secondImage, matches, wtak, pSize, eThresh):
 		#print(firstImage, secondImage)
 		# Create stitcher and stitch images
-		stitcher = cv2.createStitcher()
+		stitcher = cv2.createStitcher(True)
 		orb = cv2.ORB_create(WTA_K=wtak, scaleFactor=1.1,patchSize=pSize, edgeThreshold=eThresh)
 		if(wtak == 4):
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
