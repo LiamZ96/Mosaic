@@ -51,9 +51,9 @@ class Counting:
         for i in circles[0,:]:
             # i[0] is x coordinate, i[1] is y coordinate, i[2] is radius
             # draw the outer circle
-            #cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
+            cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
             # draw the center of the circle
-            #cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
+            cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
 
             color = self.getBrightestColor(i)
             if(color[1] == False): # if the bead is a water bead, leave it out.
@@ -63,9 +63,9 @@ class Counting:
                 self.waterBeads.append(color)
         #plt.imshow(cimg),plt.show()
         imagePath = '/'.join(self.imagePath.split('/')[:-2]) + '/results/'
-        images = [file for file in listdir(imagePath) if path.isfile((imagePath+file))]
-        fileNum = len(images)
-        imagePath += 'result_image' + str(fileNum) +'.jpg'
+        #images = [file for file in listdir(imagePath) if path.isfile((imagePath+file))]
+        #fileNum = len(images)
+        imagePath += 'result_image.jpg'#+ str(fileNum) +'.jpg'
         cv2.imwrite(imagePath, cimg)
 
         return result 
