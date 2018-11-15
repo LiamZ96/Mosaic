@@ -68,8 +68,6 @@ class Counting:
         imagePath += 'result_image' + str(fileNum) +'.jpg'
         cv2.imwrite(imagePath, cimg)
 
-        print(self.colorBeads)
-        self.getBeadsCSV()
         return result 
 
     """
@@ -253,20 +251,24 @@ class Counting:
         @param 
         @return 
     """ 
-    def getBeadsCSV(self):
-        # TODO : put the csv file in the proper folder
-        with open('beads.csv', mode='w') as beadFile:
+    def makeBeadsCSV(self):
+        newPath = self.imagePath
+        endIndex = newPath.rfind("/")
+        newPath = newPath[:endIndex]
+        newPath = newPath.replace("maps", "results")
+        newPath = newPath + "/beads.csv"
+        with open(newPath, mode='w', newline='') as beadFile:
             writer = csv.writer(beadFile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            colNames = ['Bead Number', 'Red Val', 'Green Val', 'Blue Val']
+            colNames = ['Bead Number', 'Red Val', 'Green Val', 'Blue Val', 'X-Coord', 'Y-Coord', 'Radius']
             writer.writerow(colNames)
             i = 1
             for bead in self.colorBeads:
                 r = bead[0][0]
                 g = bead[0][1]
                 b = bead[0][2]
-                if bead[1] == False:
-                    beadNum = i
-                else:
-                    beadNum = 0
-                writer.writerow([beadNum, r, g, b])
+                x = bead[2][0]
+                y = bead[2][1]
+                radius = bead[2][2]
+                beadNum = i
+                writer.writerow([beadNum, r, g, b, x, y, radius])
                 i += 1

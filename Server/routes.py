@@ -106,4 +106,5 @@ def getResults(directory):
     serverDirectory = 'Server/resources/uploads/' + directory
     count = Counting(serverDirectory)
     circles = count.getColorBeads(HoughConfig.OBJX4)
+    count.makeBeadsCSV()
     return render_template('results.html',colorBeads=circles,waterBeads=count.waterBeads, mapLocation=directory) 
