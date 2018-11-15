@@ -7,12 +7,7 @@ $(document).ready(function() {
         cancelVideo = $('#cancel-video'),
         imageUpload = $('#image-upload'),
         videoUpload = $('#video-upload'),
-        videoSource = $('#video-src')
-        magBtn = $('#mag-button'),
-        imgMagInput = $('#img-mag-input'),
-        videoMagInput = $('#video-mag-input'),
-        fourMagSelect = $('#4x'),
-        tenMagSelect = $('#10x'),
+        videoSource = $('#video-src'),
         slideHolder = $('#slide-holder'),
         videoHolder = $('#video-holder'),
         alertContainer = $('#alert-container'),
@@ -154,22 +149,6 @@ $(document).ready(function() {
             }
         })
         .fail(postFail)
-    });
-    
-    fourMagSelect.click(function(e) {
-        e.preventDefault();
-
-        imgMagInput.val('4x');
-        videoMagInput.val('4x');
-        magBtn.text('Magnification Level: 4X');
-    });
-
-    tenMagSelect.click(function(e) {
-        e.preventDefault();
-
-        imgMagInput.val('10x');
-        videoMagInput.val('10x');
-        magBtn.text('Magnification Level: 10X');
     });
 
     function createAlert(id, msg, mgrId) {
