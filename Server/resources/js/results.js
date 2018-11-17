@@ -29,6 +29,39 @@ $(window).ready(function(){
 	tableHeaderRow.appendChild(bValueHeader);
 	tableHeader.appendChild(tableHeaderRow);
 	table.appendChild(tableHeader);
+
+	let getHue = function(red, green, blue) {
+
+		let min = Math.min(Math.min(red, green), blue);
+		let max = Math.max(Math.max(red, green), blue);
+	
+		if (min == max) {
+			return 0;
+		}
+	
+		let hue = 0;
+		if (max == red) {
+			hue = (green - blue) / (max - min);
+	
+		} else if (max == green) {
+			hue = 2 + (blue - red) / (max - min);
+	
+		} else {
+			hue = 4 + (red - green) / (max - min);
+		}
+	
+		hue = Math.round(hue * 60);
+		if (hue < 0) hue = hue + 360;
+	
+		if (hue < 30)   return "Reds";
+		if (hue < 90)   return "Yellows";
+		if (hue < 150)  return "Greens";
+		if (hue < 210)  return "Cyans";
+		if (hue < 270)  return "Blues";
+		if (hue < 330)  return "Magentas";
+		return "Reds";
+		//return Math.round(hue);
+	}
 		
 	for (var key in circles) {
 		let newRow = document.createElement('tr'),
@@ -72,8 +105,6 @@ $(window).ready(function(){
 		return '#' + red+green+blue;
 	  };
 
-
-	console.log(circles);
 	let colorAry = [];
 
 	
@@ -100,13 +131,13 @@ $(window).ready(function(){
 		green.push(greenBeadData);
 		blue.push(blueBeadData);
 		colorAry.push(fullColorHex(Math.round(circles[i][0][0]), Math.round(circles[i][0][1]), Math.round(circles[i][0][2])));
+		console.log(getHue(Math.round(circles[i][0][0]), Math.round(circles[i][0][1]), Math.round(circles[i][0][2])));
 		i++;
 	};
 
 	CanvasJS.addColorSet("red", colorAry);
-	console.log(colorAry);
 
-	var redChart = {
+	let redChart = {
 		colorSet: "red",
 		title: {
 			text: "R-Values"              
@@ -119,7 +150,7 @@ $(window).ready(function(){
 		}
 		]
 	};
-	var greenChart = {
+	let greenChart = {
 		colorSet: "red",
 		title: {
 			text: "G-Values"              
@@ -132,7 +163,7 @@ $(window).ready(function(){
 		}
 		]
 	};
-	var blueChart = {
+	let blueChart = {
 		colorSet: "red",
 		title: {
 			text: "B-Values"              
@@ -151,7 +182,7 @@ $(window).ready(function(){
 	$("#blueChart").CanvasJSChart(blueChart);
 
 
-	var addImages = function(){
+	let addImages = function(){
 		
 		let address = $(location).attr('href'),
 			parts = address.split("/"),
@@ -163,7 +194,7 @@ $(window).ready(function(){
 		}
 		return r;
 	};
-	var shrinkImages = function(){
+	let shrinkImages = function(){
 		for(let j = 0; j < ImageDiv.dataset.numimages-1;j++){
 			let imageVar = "#image" + j.toString();
 			if ($(imageVar).width() > 1200){
@@ -176,7 +207,7 @@ $(window).ready(function(){
 			}
 		}
 	};
-
+	
 
 	addImages().done(shrinkImages());
 });
