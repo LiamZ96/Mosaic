@@ -3,8 +3,10 @@ import os
 from matplotlib import pyplot as plt
 import time
 import sys
-from PIL import Image
+from PIL import Image, ExifTags
 import shutil
+import multiprocessing as mp
+from collections import OrderedDict
 
 """
         Description: a class to deal with stitching images together and handling overlap of the images.
@@ -13,10 +15,11 @@ class Stitching:
 	def __init__(self):
 		self.images = []
 		self.sourceDirectory = ""
-		self.pSize = 800
-		self.eThresh = 0
+		#pSize = 800
+		#eThresh = 0
 		self.resultsDirectory =""
-		self.wtak = 0
+		#wtak = 0
+		self.results = []
 		
 
 	"""
@@ -59,6 +62,7 @@ class Stitching:
 		max_height = max(heights)
 
 		new_im = Image.new('RGB', (total_width, max_height))
+		
 
 		x_offset = 0
 		for im in images:
@@ -69,71 +73,60 @@ class Stitching:
 		shutil.rmtree(temp_path)
 
 
-	def twoRoundStitch(self):
+	def twoRoundStitch(self, sourceDirectory, resultsDirectory):
+		output = mp.Queue()
 		#first we run the two rounds with WTA_K set to 4
-		self.wtak = 4
-		completed_images = []
-		print("begin first round")
+		self.resultsDirectory = resultsDirectory
+		self.setDirectory(sourceDirectory)
+	
+		pl = mp.Pool(processes=2)
+		i1 = self.images
+		i2 = self.images
+		first_round = pl.starmap(self.stitchUnorderedImages, [(4,1000,0,i1), (2, 1000, 0, i2)])	
+		print(len(first_round[0]))
+		final_images = pl.starmap(self.stitchUnorderedImages, [(4, 200, 200, first_round[0]), (2, 200, 200, first_round[1])])
+		
+		
 		temp_dir = str(int(round(time.time())))
-		temp_dir = temp_dir + "/"
+		temp_dir = temp_dir + "/"		
 		os.makedirs(temp_dir)
-		self.pSize = 1000
-		self.eThresh = 0
-		first_round = []
-		first_round = self.stitchUnorderedImages()
-		self.images = [] #reset self.images to empty
-		self.images = first_round
-		self.pSize=200
-		self.eThresh=200
-		print("begin second round")
-		final_images = self.stitchUnorderedImages()
+
 		img_number =0
-		for img in final_images:
+		for img in final_images[0]:
 			cv2.imwrite(str(temp_dir) + str(img_number) + ".jpg",img)
 			img_number +=1
 		self.collage(temp_dir,"resultA.jpg")
 
 		#now we run two round again but with WTA_K set to 2
-		self.setDirectory(self.sourceDirectory)
-		self.wtak = 2
-		completed_images = []
-		print("begin first round")
+		#self.setDirectory(self.sourceDirectory)
+		
 		temp_dir = str(int(round(time.time())))
-		temp_dir = temp_dir + "/"
+		temp_dir = temp_dir + "/"		
 		os.makedirs(temp_dir)
-		self.pSize = 1000
-		self.eThresh = 0
-		first_round = []
-		first_round = self.stitchUnorderedImages()
-		self.images = [] #reset self.images to empty
-		self.images = first_round
-		self.pSize=200
-		self.eThresh=200
-		print("begin second round")
-		final_images = self.stitchUnorderedImages()
+		
 		img_number =0
-		for img in final_images:
+		for img in final_images[1]:
 			cv2.imwrite(str(temp_dir) + str(img_number) + ".jpg",img)
 			img_number +=1
 		self.collage(temp_dir,"resultB.jpg")
 
-	def stitchUnorderedImages(self):
+	def stitchUnorderedImages(self, wtak, pSize, eThresh, images):
 		#if not os.path.exists(self.resultsDirectory):
 		#	os.makedirs(self.resultsDirectory)
 
-		orb = cv2.ORB_create(WTA_K=self.wtak, scaleFactor=1.1,patchSize=self.pSize,edgeThreshold=self.eThresh)
-		if(self.wtak == 4):
+		orb = cv2.ORB_create(WTA_K=wtak, scaleFactor=1.1,patchSize=pSize,edgeThreshold=eThresh)
+		if(wtak == 4):
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
 		else:
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-		kpMap = {}
+		kpMap = OrderedDict()
 		matchLevel = 0
 		matchThreshold =15
 		parentKey = None
 		completed_images = []
 		
 		# Iterate through images and detect keypoints for each image and store in dictonary
-		for idx, img in enumerate(self.images):
+		for idx, img in enumerate(images):
 			kp, desc = orb.detectAndCompute(img, None)
 			if(len(kp) > 0):
 				kpMap["image" + str(idx)] = (kp, desc, img)
@@ -149,7 +142,7 @@ class Stitching:
 			if(parentKey == None):
 				parentKey = next(iter(kpMap))
 			parentValue = kpMap[parentKey]
-			allMatches = {}
+			allMatches = OrderedDict()
 			if(matchLevel > len(kpMap)):
 				matchThreshold +=10
 			# Second Iteration to find all the matching keypoints for parentKeypoints
@@ -183,7 +176,7 @@ class Stitching:
 			# Sort them in the order of their distance.
 			matches = sorted(bestKeyPoints[1], key = lambda x:x.distance)
 			# Stitch best matching image with parentImage
-			stitchedImg = self.__stitchImages(parentValue, bestMatch, matches)
+			stitchedImg = self.__stitchImages(parentValue, bestMatch, matches, wtak, pSize, eThresh)
 			if (len(stitchedImg) == 3):
 				kpMap[parentKey] = stitchedImg
 				matchLevel =0
@@ -205,7 +198,7 @@ class Stitching:
 		# Check if results directory exist, if not create it
 		
 
-		
+		#print(len(completed_images))
 		return completed_images
 
 	"""
@@ -218,20 +211,30 @@ class Stitching:
 		self.sourceDirectory = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", path))
 
 		# Read images and append to image array
-		self.images = []
-		for file in os.listdir(self.sourceDirectory):
+		current_images = {}
+		for file in os.listdir(self.sourceDirectory):			
 			if(file.find('jpg') != -1 or file.find('JPG') != -1):
-				self.images.append(cv2.imread(os.path.join(self.sourceDirectory, file), cv2.IMREAD_COLOR))
+				path = os.path.join(self.sourceDirectory, file)
+				#self.images.append(cv2.imread(path, cv2.IMREAD_COLOR))
+				img = Image.open(path)
+				exif = { ExifTags.TAGS[k]: v for k, v in img._getexif().items() if k in ExifTags.TAGS }
+				current_images[path] = exif['DateTimeOriginal']
+		sorted_by_value = sorted(current_images.items(), key=lambda kv: kv[1])
+		for key in sorted_by_value:
+			self.images.append(cv2.imread(key[0], cv2.IMREAD_COLOR))
+			
+
+		
 
 	def setResultsDirectory(self,path):
 		self.resultsDirectory = path
 
-	def __stitchImages(self, firstImage, secondImage, matches):
+	def __stitchImages(self, firstImage, secondImage, matches, wtak, pSize, eThresh):
 		#print(firstImage, secondImage)
 		# Create stitcher and stitch images
-		stitcher = cv2.createStitcher()
-		orb = cv2.ORB_create(WTA_K=self.wtak, scaleFactor=1.1,patchSize=self.pSize, edgeThreshold=self.eThresh)
-		if(self.wtak == 4):
+		stitcher = cv2.createStitcher(True)
+		orb = cv2.ORB_create(WTA_K=wtak, scaleFactor=1.1,patchSize=pSize, edgeThreshold=eThresh)
+		if(wtak == 4):
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
 		else:
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)

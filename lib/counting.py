@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 import random
 import math
 import itertools
+import csv
 from enum import Enum
 from os import listdir, path
 
@@ -60,14 +61,15 @@ class Counting:
                 result.append(color)
             else: 
                 self.waterBeads.append(color)
-        
+        #plt.imshow(cimg),plt.show()
         imagePath = '/'.join(self.imagePath.split('/')[:-2]) + '/results/'
-        images = [file for file in listdir(imagePath) if path.isfile((imagePath+file))]
-        fileNum = len(images)
-        imagePath += 'result_image' + str(fileNum) +'.jpg'
+        #images = [file for file in listdir(imagePath) if path.isfile((imagePath+file))]
+        #fileNum = len(images)
+        imagePath += 'result_image.jpg'#+ str(fileNum) +'.jpg'
         cv2.imwrite(imagePath, cimg)
+
         return result 
-        
+
     """
         Description: a function that takes a cicle's RGB values and returns if it is water or not
         @param RGB - tuple containing the average red, green, and blue values of a circle
@@ -187,7 +189,7 @@ class Counting:
                     and returns a list containing tuple with the bead's average RGB values of the top 10% and boolean isWater
         @param circleInfo - array that contains a circle's x and y coordinates of the center and the radius of the circle
         @param imageMap - a map (image) of the microscope images in color.
-        @return a list containing tuple with average RGB values of top 10% from bead and boolean isWater
+        @return a list containing tuple with average RGB values of top 10% from bead, boolean isWater, and x,y,radius value of the bead.
     """        
     def getBrightestColor(self, circleInfo):
         img = self.colorMap
@@ -224,7 +226,7 @@ class Counting:
 
         average = (round(np.mean(reds), 2), round(np.mean(greens), 2), round(np.mean(blues), 2))
         isWater = self.isWater(average)
-        return [average, isWater]
+        return [[average[0],average[1],average[2]], isWater, [circleInfo[0],circleInfo[1],circleInfo[2]]] #[[R,G,B], isWater, [x,y,radius]]
 
 
     """
@@ -241,3 +243,32 @@ class Counting:
             # x and y given here were assuming that the center was at 0,0 therefore you must add the actual center coordinates to give accurate ones back
             yield from set((( centerX + x, centerY + y), (centerX + x, centerY -y), (centerX -x, centerY + y), (centerX -x, centerY -y),))
                     
+
+    """
+        Description: 
+        @param 
+        @param
+        @param 
+        @return 
+    """ 
+    def makeBeadsCSV(self):
+        newPath = self.imagePath
+        endIndex = newPath.rfind("/")
+        newPath = newPath[:endIndex]
+        newPath = newPath.replace("maps", "results")
+        newPath = newPath + "/beads.csv"
+        with open(newPath, mode='w', newline='') as beadFile:
+            writer = csv.writer(beadFile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            colNames = ['Bead Number', 'Red Val', 'Green Val', 'Blue Val', 'X-Coord', 'Y-Coord', 'Radius']
+            writer.writerow(colNames)
+            i = 1
+            for bead in self.colorBeads:
+                r = bead[0][0]
+                g = bead[0][1]
+                b = bead[0][2]
+                x = bead[2][0]
+                y = bead[2][1]
+                radius = bead[2][2]
+                beadNum = i
+                writer.writerow([beadNum, r, g, b, x, y, radius])
+                i += 1

@@ -13,7 +13,7 @@ def printCircles(counter,circles):
 def main():
 
     # 4x demo 
-    count = Counting("./test/resources/sampleMaps/resultsmap.jpg")
+    count = Counting("./Server/resources/uploads/2018-10-30T09-33-40/maps/resultA.jpg")
     circles = count.getColorBeads(HoughConfig.OBJX4)
     printCircles(count,circles)
     

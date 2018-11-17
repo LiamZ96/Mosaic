@@ -9,8 +9,7 @@ $(window).ready(function(){
 		beadNumberHeader = document.createElement('th'),
 		rValueHeader = document.createElement('th'),
 		gValueHeader = document.createElement('th'),
-		bValueHeader = document.createElement('th'),
-		j = 0;
+		bValueHeader = document.createElement('th');
 
 	table.className = 'table table-sm';
 	beadNumberHeader.innerText = '#';
@@ -29,6 +28,7 @@ $(window).ready(function(){
 	tableHeaderRow.appendChild(bValueHeader);
 	tableHeader.appendChild(tableHeaderRow);
 	table.appendChild(tableHeader);
+
 
 	let getHue = function(red, green, blue) {
 
@@ -64,29 +64,32 @@ $(window).ready(function(){
 	}
 		
 	for (var key in circles) {
+
+	var j = 0;
+	beads.colorBeads.forEach(function(circle){
+
 		let newRow = document.createElement('tr'),
 			beadNumber = document.createElement('th'),
 			bead_r_value = document.createElement('td'),
 			bead_g_value = document.createElement('td'),
 			bead_b_value = document.createElement('td');
-
+	
 			beadNumber.setAttribute("scope", "row");
 			beadNumber.innerText = j + 1;
-			bead_r_value.innerText = Math.round(circles[j][0][0]);
-			bead_g_value.innerText = Math.round(circles[j][0][1]);
-			bead_b_value.innerText = Math.round(circles[j][0][2]);
-
+			bead_r_value.innerText = Math.round(circle[0][0]);
+			bead_g_value.innerText = Math.round(circle[0][1]);
+			bead_b_value.innerText = Math.round(circle[0][2]);
+	
 			newRow.appendChild(beadNumber);
 			newRow.appendChild(bead_r_value);
 			newRow.appendChild(bead_g_value);
 			newRow.appendChild(bead_b_value);
-
+	
 			table.appendChild(newRow);
-
-			j++;
-	}
-
-	document.getElementsByClassName('container')[0].replaceChild(table, beadTableDiv);
+		j++;
+	
+	});
+	document.getElementsByClassName('graphdiv')[0].replaceChild(table, beadTableDiv);
 
 
 
@@ -115,25 +118,26 @@ $(window).ready(function(){
 	let red = [],
 		green = [],
 		blue = [],
-		i = 0;		
-		
-	for (var key in circles) {
+		i;		
+
+	beads.colorBeads.forEach(function(circle){
 		var redBeadData = {},
 			greenBeadData = {},
 			blueBeadData = {};
 		redBeadData.label = i;
 		greenBeadData.label = i;
 		blueBeadData.label = i;
-		redBeadData.y = circles[i][0][0];
-		greenBeadData.y = circles[i][0][1];
-		blueBeadData.y = circles[i][0][2];
+		redBeadData.y = circle[0][0];
+		greenBeadData.y = circle[0][1];
+		blueBeadData.y = circle[0][2];
 		red.push(redBeadData);
 		green.push(greenBeadData);
 		blue.push(blueBeadData);
 		colorAry.push(fullColorHex(Math.round(circles[i][0][0]), Math.round(circles[i][0][1]), Math.round(circles[i][0][2])));
 		console.log(getHue(Math.round(circles[i][0][0]), Math.round(circles[i][0][1]), Math.round(circles[i][0][2])));
 		i++;
-	};
+	});
+
 
 	CanvasJS.addColorSet("red", colorAry);
 
@@ -180,7 +184,6 @@ $(window).ready(function(){
 	$("#redChart").CanvasJSChart(redChart);
 	$("#greenChart").CanvasJSChart(greenChart);
 	$("#blueChart").CanvasJSChart(blueChart);
-
 
 	let addImages = function(){
 		

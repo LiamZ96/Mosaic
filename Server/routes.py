@@ -51,7 +51,6 @@ def error():
 @app.route('/uploadImages', methods=["POST"])
 def uploadImages(): 
     images = request.files.getlist("images")
-    magLevel = request.form["mag-level"]
 
     newDir = setupUploadDir()
 
@@ -98,20 +97,18 @@ def getStitchedImage(directory):
     stitcher.setResultsDirectory(dirPrefix + directory + "/maps/")
 
     stitcher.twoRoundStitch()
-    numFiles = len([name for name in os.listdir(dirPrefix+directory+"/maps")]) + 1
-    return render_template('stitched.html', numFiles=numFiles, direct=directory)
+    return render_template('stitched.html', direct=directory)
 
 # accepts a path to the stitched image directory
 @app.route('/getResults/<path:directory>')
 def getResults(directory): 
-    directory = 'Server/resources/uploads/' + directory
-    count = Counting(directory)
-    circles = count.getColorBeads(HoughConfig.OBJX4)
-    valid = len(circles)
-    water = len(count.waterBeads)
-    return render_template('results.html', validBeads=valid, waterBeads=water, circles=json.dumps(circles)) 
-
-# @app.route('/getResults/<path:directory>')
-# def api_info():
-    
-#     return jsonify('hey')
+    magLevel = request.args.get('magLevel')
+    if(magLevel == "4x"):
+        magLevel = HoughConfig.OBJX4
+    else: 
+        magLevel = HoughConfig.OBJX10
+    serverDirectory = 'Server/resources/uploads/' + directory
+    count = Counting(serverDirectory)
+    circles = count.getColorBeads(magLevel)
+    count.makeBeadsCSV()
+    return render_template('results.html',colorBeads=circles,waterBeads=count.waterBeads, mapLocation=directory) 
