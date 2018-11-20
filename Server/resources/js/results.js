@@ -28,7 +28,42 @@ $(window).ready(function(){
 	tableHeaderRow.appendChild(bValueHeader);
 	tableHeader.appendChild(tableHeaderRow);
 	table.appendChild(tableHeader);
-	var j = 0;
+	let j = 0;
+
+
+	let getHue = function(red, green, blue) {
+
+		let min = Math.min(Math.min(red, green), blue);
+		let max = Math.max(Math.max(red, green), blue);
+	
+		if (min == max) {
+			return 0;
+		}
+	
+		let hue = 0;
+		if (max == red) {
+			hue = (green - blue) / (max - min);
+	
+		} else if (max == green) {
+			hue = 2 + (blue - red) / (max - min);
+	
+		} else {
+			hue = 4 + (red - green) / (max - min);
+		}
+	
+		hue = Math.round(hue * 60);
+		if (hue < 0) hue = hue + 360;
+	
+		if (hue < 30)   return "Reds";
+		if (hue < 90)   return "Yellows";
+		if (hue < 150)  return "Greens";
+		if (hue < 210)  return "Cyans";
+		if (hue < 270)  return "Blues";
+		if (hue < 330)  return "Magentas";
+		return "Reds";
+		//return Math.round(hue);
+	}
+
 	beads.colorBeads.forEach(function(circle){
 		let newRow = document.createElement('tr'),
 			beadNumber = document.createElement('th'),
@@ -56,7 +91,7 @@ $(window).ready(function(){
 
 
 	let rgbToHex = function (rgb) { 
-		var hex = Number(rgb).toString(16);
+		let hex = Number(rgb).toString(16);
 		if (hex.length < 2) {
 			 hex = "0" + hex;
 		}
@@ -64,9 +99,9 @@ $(window).ready(function(){
 	  };
 
 	  let fullColorHex = function(r,g,b) {   
-		var red = rgbToHex(r);
-		var green = rgbToHex(g);
-		var blue = rgbToHex(b);
+		let red = rgbToHex(r);
+		let green = rgbToHex(g);
+		let blue = rgbToHex(b);
 		return '#' + red+green+blue;
 	  };
 
@@ -85,19 +120,20 @@ $(window).ready(function(){
 		i;		
 
 	beads.colorBeads.forEach(function(circle){
-		var redBeadData = {},
+		let redBeadData = {},
 			greenBeadData = {},
 			blueBeadData = {};
-		redBeadData.label = i;
-		greenBeadData.label = i;
-		blueBeadData.label = i;
-		redBeadData.y = circle[0][0];
-		greenBeadData.y = circle[0][1];
-		blueBeadData.y = circle[0][2];
-		red.push(redBeadData);
-		green.push(greenBeadData);
-		blue.push(blueBeadData);
+		// redBeadData.label = i;
+		// greenBeadData.label = i;
+		// blueBeadData.label = i;
+		// redBeadData.y = circle[0][0];
+		// greenBeadData.y = circle[0][1];
+		// blueBeadData.y = circle[0][2];
+		red.push(circle[0][0]);
+		green.push(circle[0][1]);
+		blue.push(circle[0][2]);
 		colorAry.push(fullColorHex(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2])));
+		console.log(getHue(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2])));
 		i++;
 	});
 
@@ -105,7 +141,7 @@ $(window).ready(function(){
 	CanvasJS.addColorSet("red", colorAry);
 	console.log(colorAry);
 
-	var redChart = {
+	let redChart = {
 		colorSet: "red",
 		title: {
 			text: "R-Values"              
@@ -118,7 +154,7 @@ $(window).ready(function(){
 		}
 		]
 	};
-	var greenChart = {
+	let greenChart = {
 		colorSet: "red",
 		title: {
 			text: "G-Values"              
@@ -131,7 +167,7 @@ $(window).ready(function(){
 		}
 		]
 	};
-	var blueChart = {
+	let blueChart = {
 		colorSet: "red",
 		title: {
 			text: "B-Values"              
@@ -145,7 +181,105 @@ $(window).ready(function(){
 		]
 	};
 
-	$("#redChart").CanvasJSChart(redChart);
-	$("#greenChart").CanvasJSChart(greenChart);
-	$("#blueChart").CanvasJSChart(blueChart);
+	//New Histogram
+	let x1 = [];
+	let y1 = [];
+	// for (let z = 1; z < 500; z++) 
+	// {
+	// let k = Math.random();
+	// x1.push(k*5);
+	// y1.push(k);
+	// }
+	let trace1 = {
+		x: red,
+		name: 'red',
+		autobinx: false, 
+		histnorm: "count", 
+		marker: {
+			color: "rgba(255, 100, 102, 0.7)", 
+			line: {
+			color:  "rgba(255, 100, 102, 1)", 
+			width: 1
+			}
+		},  
+		opacity: 0.5, 
+		type: "histogram", 
+		xbins: {
+			end: 255, 
+			size: 5, 
+			start: 0
+		}
+	};
+	let trace2 = {
+		x: green,
+		autobinx: false, 
+		marker: {
+				color: "rgba(100, 200, 102, 0.7)",
+				line: {
+					color:  "rgba(100, 200, 102, 1)", 
+					width: 1
+			} 
+			}, 
+		name: "green", 
+		opacity: 0.75, 
+		type: "histogram", 
+		xbins: { 
+			end: 255, 
+			size: 5, 
+			start: 0
+
+		}
+	};
+	let trace3 = {
+		x: blue,
+		autobinx: false, 
+		marker: {
+				color: "#b1cfeb",
+				line: {
+					color:  "#447bdc", 
+					width: 1
+			} 
+			}, 
+		name: "blue", 
+		opacity: 0.75, 
+		type: "histogram", 
+		xbins: { 
+			end: 255, 
+			size: 5, 
+			start: 0
+
+		}
+	};
+	let data = [trace1, trace2, trace3];
+	let red_layout = {
+		bargap: 0.05, 
+		bargroupgap: 0.2, 
+		barmode: "overlay", 
+		title: "Red Values", 
+		xaxis: {title: "R Value"}, 
+		yaxis: {title: "Count"}
+	};
+	let green_layout = {
+		bargap: 0.05, 
+		bargroupgap: 0.2, 
+		barmode: "overlay", 
+		title: "G Values", 
+		xaxis: {title: "G Value"}, 
+		yaxis: {title: "Count"}
+	};
+	let blue_layout = {
+		bargap: 0.05, 
+		bargroupgap: 0.2, 
+		barmode: "overlay", 
+		title: "B Values", 
+		xaxis: {title: "B Value"}, 
+		yaxis: {title: "Count"}
+	};
+	Plotly.newPlot('redChart', [trace1], red_layout);
+	Plotly.newPlot('greenChart', [trace2], green_layout);
+	Plotly.newPlot('blueChart', [trace3], blue_layout);
+
+	// $("#redChart").CanvasJSChart(redChart);
+	// $("#greenChart").CanvasJSChart(greenChart);
+	// $("#blueChart").CanvasJSChart(blueChart);
 });
