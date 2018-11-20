@@ -105,30 +105,12 @@ $(window).ready(function(){
 		return '#' + red+green+blue;
 	  };
 
-
-
-	let colorAry = [];
-
-	
-	//CanvasJS.addColorSet("red", ['#8F1500']);
-	CanvasJS.addColorSet("green", ['#007F00']);
-	CanvasJS.addColorSet("blue", ['#1034A6']);
-
 	let red = [],
 		green = [],
 		blue = [],
 		i;		
 
 	beads.colorBeads.forEach(function(circle){
-		let redBeadData = {},
-			greenBeadData = {},
-			blueBeadData = {};
-		// redBeadData.label = i;
-		// greenBeadData.label = i;
-		// blueBeadData.label = i;
-		// redBeadData.y = circle[0][0];
-		// greenBeadData.y = circle[0][1];
-		// blueBeadData.y = circle[0][2];
 		red.push(circle[0][0]);
 		green.push(circle[0][1]);
 		blue.push(circle[0][2]);
@@ -148,7 +130,6 @@ $(window).ready(function(){
 		},
 		data: [              
 		{
-			// Change type to "doughnut", "line", "splineArea", etc.
 			type: "column",
 			dataPoints: red
 		}
@@ -161,7 +142,6 @@ $(window).ready(function(){
 		},
 		data: [              
 		{
-			// Change type to "doughnut", "line", "splineArea", etc.
 			type: "column",
 			dataPoints: green
 		}
@@ -174,7 +154,6 @@ $(window).ready(function(){
 		},
 		data: [              
 		{
-			// Change type to "doughnut", "line", "splineArea", etc.
 			type: "column",
 			dataPoints: blue
 		}
@@ -182,14 +161,6 @@ $(window).ready(function(){
 	};
 
 	//New Histogram
-	let x1 = [];
-	let y1 = [];
-	// for (let z = 1; z < 500; z++) 
-	// {
-	// let k = Math.random();
-	// x1.push(k*5);
-	// y1.push(k);
-	// }
 	let trace1 = {
 		x: red,
 		name: 'red',
@@ -278,8 +249,4 @@ $(window).ready(function(){
 	Plotly.newPlot('redChart', [trace1], red_layout);
 	Plotly.newPlot('greenChart', [trace2], green_layout);
 	Plotly.newPlot('blueChart', [trace3], blue_layout);
-
-	// $("#redChart").CanvasJSChart(redChart);
-	// $("#greenChart").CanvasJSChart(greenChart);
-	// $("#blueChart").CanvasJSChart(blueChart);
 });
