@@ -96,7 +96,7 @@ def getStitchedImage(directory):
     stitcher.setDirectory(dirPrefix + directory + "/images")
     stitcher.setResultsDirectory(dirPrefix + directory + "/maps/")
 
-    stitcher.twoRoundStitch()
+    stitcher.twoRoundStitch(dirPrefix + directory + "/images",dirPrefix + directory + "/maps/")
     return render_template('stitched.html', direct=directory)
 
 # accepts a path to the stitched image directory
