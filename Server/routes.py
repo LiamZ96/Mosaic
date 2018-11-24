@@ -93,10 +93,10 @@ def uploadVideo():
 def getStitchedImage(directory): 
     dirPrefix="Server/resources/uploads/"
     stitcher = Stitching()
-    stitcher.setDirectory(dirPrefix + directory + "/images")
-    stitcher.setResultsDirectory(dirPrefix + directory + "/maps/")
+    #stitcher.setDirectory(dirPrefix + directory + "/images")
+    #stitcher.setResultsDirectory(dirPrefix + directory + "/maps/")
 
-    stitcher.twoRoundStitch()
+    stitcher.twoRoundStitch(dirPrefix + directory + "/images/", dirPrefix + directory + "/maps/")
     return render_template('stitched.html', direct=directory)
 
 # accepts a path to the stitched image directory
