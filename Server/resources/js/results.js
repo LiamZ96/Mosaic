@@ -114,14 +114,14 @@ $(window).ready(function(){
 		red.push(circle[0][0]);
 		green.push(circle[0][1]);
 		blue.push(circle[0][2]);
-		colorAry.push(fullColorHex(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2])));
+		//colorAry.push(fullColorHex(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2])));
 		console.log(getHue(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2])));
 		i++;
 	});
 
 
-	CanvasJS.addColorSet("red", colorAry);
-	console.log(colorAry);
+	// CanvasJS.addColorSet("red", colorAry);
+	// console.log(colorAry);
 
 	let redChart = {
 		colorSet: "red",
