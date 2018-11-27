@@ -76,7 +76,7 @@ $(document).ready(function() {
     videoUpload.change(function(e) {
         cancelImages.click();
 
-        if (this.files[0].name.endsWith('.mp4')) {
+        if (this.files[0].name.endsWith('.avi')) {
             videoSource[0].src = URL.createObjectURL(this.files[0]);
             videoSource.parent()[0].load();
             videoSource.parent().removeClass('d-none');
@@ -96,7 +96,7 @@ $(document).ready(function() {
             submit.prop('disabled', false);
         }
         else {
-            createAlert('video-alert', 'Only video files of format .mp4 are allowed', 'videoFormatTimeout');
+            createAlert('video-alert', 'Only video files of format .avi are allowed', 'videoFormatTimeout');
             this.value = null;
         }
     });
