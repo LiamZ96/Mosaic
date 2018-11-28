@@ -115,7 +115,7 @@ $(window).ready(function(){
 		green.push(circle[0][1]);
 		blue.push(circle[0][2]);
 		//colorAry.push(fullColorHex(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2])));
-		console.log(getHue(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2])));
+		//console.log(getHue(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2])));
 		i++;
 	});
 
