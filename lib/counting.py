@@ -1,3 +1,27 @@
+'''
+MIT License
+
+Copyright (c) 2018 LiamZ96
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
+
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
@@ -106,83 +130,6 @@ class Counting:
                 r.append(bgr[2])
         return[r, g, b]
    
-    """
-        NOT CURRENTLY BEING USED BUT SHOULD BE LEFT FOR FUTURE USE (OPTIONAL) BY USER
-
-        Description: a function that takes an array representing a circle's[x-coord of center, y-coord of center, radius]
-                    and returns an array containing the bead's average RGB values and a boolean isWater
-        @param circleInfo - array that contains a circle's x and y coordinates of the center and the radius of the circle
-        @param imageMap - a map (image) of the microscope images in color.
-        @return a tuple containing bead sample avg RGB values
-    """        
-    def getSampleAvgColor(self, circleInfo, imageMap):
-        random.seed(0)
-        img = self.colorMap
-        imgY = img.shape[0]
-        imgX = img.shape[1]
-        r, g, b = [], [], []
-        x = circleInfo[0]
-        y = circleInfo[1]
-        radius = circleInfo[2]
-
-        # this might need to be adjusted
-        # buffer is to eliminate the outside shadows factoring in on the edges of beads
-        buffer = math.ceil(0.3 * radius)
-        
-        # 1st quadrant
-        minX = x
-        maxX = x + (radius - buffer)
-        minY = y
-        maxY = y + (radius - buffer)
-
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
-        r.append(quadRGB[0])
-        g.append(quadRGB[1])
-        b.append(quadRGB[2])
-
-        # 2nd quadrant
-        minX = x - (radius - buffer)
-        maxX = x
-        minY = y
-        maxY = y + (radius - buffer)
-
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
-        r.append(quadRGB[0])
-        g.append(quadRGB[1])
-        b.append(quadRGB[2])
-
-        # 3rd quadrant
-        minX = x - (radius - buffer)
-        maxX = x
-        minY = y - (radius - buffer)
-        maxY = y
-
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
-        r.append(quadRGB[0])
-        g.append(quadRGB[1])
-        b.append(quadRGB[2])
-
-        # 4th quadrant
-        minX = x
-        maxX = x + (radius - buffer)
-        minY = y
-        maxY = y + (radius - buffer)
-
-        quadRGB = self.getQuadrantRGBSamples(minX, minY, maxX, maxY, imgX, imgY)
-        r.append(quadRGB[0])
-        g.append(quadRGB[1])
-        b.append(quadRGB[2])
-
-        flatR = list(itertools.chain(*r))
-        flatG = list(itertools.chain(*g))
-        flatB = list(itertools.chain(*b))
-
-        avgBlue = round(np.mean(flatB), 2)
-        avgGreen = round(np.mean(flatG), 2)
-        avgRed = round(np.mean(flatR), 2)
-        averageRGB = (avgRed, avgGreen, avgBlue)
-
-        return averageRGB
 
     """
         Description: a function that takes an array representing a circle's[x-coord of center, y-coord of center, radius]
