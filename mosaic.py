@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
 
+'''Authors: Jacob Wakefield, Liam Zay, McKenna Gates'''
+
 from lib.stitching import Stitching 
 from lib.counting import Counting, HoughConfig
 from matplotlib import pyplot as plt

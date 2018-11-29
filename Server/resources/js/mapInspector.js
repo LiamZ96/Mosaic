@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+//Authors: Jacob Wakefield
+
 var imageObj = undefined; //the stitched map image
 
     /*

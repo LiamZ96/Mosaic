@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
+#Requirements in this file: 3.1.2, 3.1.4, 3.1.5, 3.1.11, 3.2.7, 3.3.2
+#Authors: Jacob Wakefield, Noah Zeilmann, McKenna Gates, Liam Zay
 
 from . import app
 from flask import render_template, send_from_directory, request, url_for, redirect, jsonify

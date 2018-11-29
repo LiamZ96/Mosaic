@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
+#Requirements in this file: 3.1.6, 3.2.4, 3.2.6
+#Authors: Noah Zeilmann, Josiah Carpenter
 
 import cv2
 import os

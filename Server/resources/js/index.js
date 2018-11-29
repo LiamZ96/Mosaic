@@ -22,6 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+//Requirements in this file: 3.2.1, 3.4.1.1
+//Authors: Jacob Wakefield, Noah Zeilmann, McKenna Gates
+
 'use-strict'
 $(document).ready(function() {
     let submit = $('#submit'),

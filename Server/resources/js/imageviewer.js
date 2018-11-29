@@ -29,6 +29,8 @@ SOFTWARE.
     Demo on: http://ignitersworld.com/lab/imageViewer.html
 */
 
+// Authors: Jacob Wakefield
+
 /*** picture view plugin ****/
 (function ($, window, document, undefined) {
     "use strict";

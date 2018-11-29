@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+//Authors: Noah Zeilmann, Luke Johnson
+
 'use strict';
 
 $(window).ready(function(){
