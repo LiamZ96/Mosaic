@@ -116,21 +116,6 @@ class Counting:
         if red <= minRGBValue and green <= minRGBValue and blue <= minRGBValue:
             isWater = True 
         return isWater
-
-    def getQuadrantRGBSamples(self, minX, minY, maxX, maxY, imgX, imgY):
-        img = self.colorMap
-        b, g, r = [], [], []
-        for i in range(0,50):
-            randX = random.randint(minX, maxX)
-            randY = random.randint(minY, maxY)
-            if (randY >= imgY) or (randX >= imgX):
-                pass
-            else:
-                bgr = img[randY, randX]
-                b.append(bgr[0])
-                g.append(bgr[1])
-                r.append(bgr[2])
-        return[r, g, b]
    
 
     """
