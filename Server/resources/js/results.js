@@ -94,7 +94,7 @@ $(window).ready(function(){
 			return "magenta";
 		return "red";
 	}
-
+	
 	beads.colorBeads.forEach(function(circle){
 		let newRow = document.createElement('tr'),
 			beadNumber = document.createElement('th'),
@@ -172,18 +172,18 @@ $(window).ready(function(){
 
 
 	if(yellowCount>0)
-		countedString += `${yellowCount} yellow beads `;
+		countedString += `${yellowCount} yellow beads, `;
 	if(redCount>0)
-		countedString += `${redCount} red beads `;
+		countedString += `${redCount} red beads, `;
 	if(greenCount>0)
-		countedString += `${greenCount} green beads `;
+		countedString += `${greenCount} green beads, `;
 	if(cyanCount>0)
-		countedString += `${cyanCount} cyan beads `;
+		countedString += `${cyanCount} cyan beads, `;
 	if(blueCount>0)
-		countedString += `${blueCount} blue beads `;
+		countedString += `${blueCount} blue beads, `;
 	if(magentaCount>0)
 		countedString += `${magentaCount} magenta beads `;
-	countedString += `detected.`;
+	countedString += `${beads.colorBeads.length} total beads, and ${beads.waterBeads.length} water beads detected.`;
 
 	document.getElementById('CountDiv').innerText = countedString;
 
@@ -225,7 +225,7 @@ $(window).ready(function(){
 		]
 	};
 
-	//New Histogram
+	//New Histograms
 	let trace1 = {
 		x: red,
 		name: 'red',
