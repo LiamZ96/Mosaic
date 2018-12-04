@@ -26,6 +26,7 @@ SOFTWARE. -->
         <meta charset='utf-8'>
         <title>Mosaic</title>
         <link rel='stylesheet' type='text/css' href='/resources/css/index.css'>
+        <link rel='stylesheet' type='text/css' href='/resources/css/results.css'>
         <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css' integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossorigin='anonymous'>
         <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
     </head>
@@ -34,16 +35,24 @@ SOFTWARE. -->
             <div class="row">
                 <div class="col-12">
                     <h1>Results</h1>
-                    <div id="CountDiv"><p>There were {{colorBeads|length}} valid beads and {{waterBeads|length}} water drops detected.</p></div>
+                    <div id="CountDiv"><p></p></div>
                 </div>
             </div>
             <div class="row">
                 <div id="canvasWrapper" style="overflow-x: scroll;" class="col-12">
-                    <canvas id="mapCanvas" style="border:2px solid;"></canvas>
+                    <canvas id="mapCanvas" class="image"></canvas>
                 </div>
             </div>
             <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="bucketSize" class="sr-only">Bucket Size</label>
+                        <input class="form-control" type="number" id="bucketSize" placeholder="Bucket Size">
+                    </div>
+                    <button id="btn" type="submit" class="btn btn-primary mb-2">Submit</button>
+                </form>
                 <div class="graphdiv col-12">
+                    <div id="combinedChart" style="height: 500px; width: 100%;"></div>
                     <div id="redChart" style="height: 500px; width: 100%;"></div>
                     <div id="greenChart" style="height: 500px; width: 100%;"></div>
                     <div id="blueChart" style="height: 500px; width: 100%;"></div>
