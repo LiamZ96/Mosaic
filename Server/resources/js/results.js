@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-//Authors: Noah Zeilmann, Luke Johnson
+//Author: Luke Johnson
 
 'use strict';
 
@@ -35,7 +35,8 @@ $(window).ready(function(){
 		beadNumberHeader = document.createElement('th'),
 		rValueHeader = document.createElement('th'),
 		gValueHeader = document.createElement('th'),
-		bValueHeader = document.createElement('th');
+		bValueHeader = document.createElement('th'),
+		j = 0;
 
 	table.className = 'table table-sm';
 	beadNumberHeader.innerText = '#';
@@ -54,7 +55,6 @@ $(window).ready(function(){
 	tableHeaderRow.appendChild(bValueHeader);
 	tableHeader.appendChild(tableHeaderRow);
 	table.appendChild(tableHeader);
-	let j = 0;
 
 
 	let getHue = function(red, green, blue) {
@@ -80,14 +80,19 @@ $(window).ready(function(){
 		hue = Math.round(hue * 60);
 		if (hue < 0) hue = hue + 360;
 	
-		if (hue < 30)   return "Reds";
-		if (hue < 90)   return "Yellows";
-		if (hue < 150)  return "Greens";
-		if (hue < 210)  return "Cyans";
-		if (hue < 270)  return "Blues";
-		if (hue < 330)  return "Magentas";
-		return "Reds";
-		//return Math.round(hue);
+		if (hue < 30)   
+			return "red";
+		if (hue < 90)   
+			return "yellow";
+		if (hue < 150)  
+			return "green";
+		if (hue < 210)
+			return "cyan";
+		if (hue < 270)
+			return "blue";
+		if (hue < 330)  
+			return "magenta";
+		return "red";
 	}
 
 	beads.colorBeads.forEach(function(circle){
@@ -112,9 +117,8 @@ $(window).ready(function(){
 		j++;
 	
 	});
+
 	document.getElementsByClassName('graphdiv')[0].replaceChild(table, beadTableDiv);
-
-
 
 	let rgbToHex = function (rgb) { 
 		let hex = Number(rgb).toString(16);
@@ -134,20 +138,55 @@ $(window).ready(function(){
 	let red = [],
 		green = [],
 		blue = [],
-		i;		
+		i,
+		redCount = 0,
+		yellowCount = 0,
+		greenCount = 0,
+		cyanCount = 0,
+		blueCount = 0,
+		magentaCount = 0,
+		countedString = `There were `;	
 
 	beads.colorBeads.forEach(function(circle){
 		red.push(circle[0][0]);
 		green.push(circle[0][1]);
 		blue.push(circle[0][2]);
-		//colorAry.push(fullColorHex(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2])));
-		//console.log(getHue(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2])));
+
+		//Get the hue of the bead and add it to the count
+		let hue = getHue(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2]));
+		if(hue === 'red')
+			redCount++;
+		else if(hue === 'yellow')
+			yellowCount++;
+		else if(hue === 'green')
+			greenCount++;
+		else if(hue === 'cyan')
+			cyanCount++;
+		else if(hue === 'blue')
+			blueCount++;
+		else if(hue === 'magenta')
+			magentaCount++;
+		
 		i++;
 	});
 
 
-	// CanvasJS.addColorSet("red", colorAry);
-	// console.log(colorAry);
+	if(yellowCount>0)
+		countedString += `${yellowCount} yellow beads `;
+	if(redCount>0)
+		countedString += `${redCount} red beads `;
+	if(greenCount>0)
+		countedString += `${greenCount} green beads `;
+	if(cyanCount>0)
+		countedString += `${cyanCount} cyan beads `;
+	if(blueCount>0)
+		countedString += `${blueCount} blue beads `;
+	if(magentaCount>0)
+		countedString += `${magentaCount} magenta beads `;
+	countedString += `detected.`;
+
+	document.getElementById('CountDiv').innerText = countedString;
+
 
 	let redChart = {
 		colorSet: "red",
@@ -272,7 +311,32 @@ $(window).ready(function(){
 		xaxis: {title: "B Value"}, 
 		yaxis: {title: "Count"}
 	};
+	let combined_layout = {
+		bargap: 0.05, 
+		bargroupgap: 0.2, 
+		barmode: "overlay", 
+		title: "Combined Graph", 
+		xaxis: {title: "Value"}, 
+		yaxis: {title: "Count"}
+	};
+	Plotly.newPlot('combinedChart', [trace1, trace2, trace3], combined_layout);
 	Plotly.newPlot('redChart', [trace1], red_layout);
 	Plotly.newPlot('greenChart', [trace2], green_layout);
 	Plotly.newPlot('blueChart', [trace3], blue_layout);
+
+	document.getElementById('btn').addEventListener('click', () => {
+		event.preventDefault();
+		let bucketSize = document.getElementById('bucketSize').value;
+		console.log(bucketSize);
+		trace1.xbins.size = bucketSize;
+		trace2.xbins.size = bucketSize;
+		trace3.xbins.size = bucketSize;
+		
+		Plotly.newPlot('combinedChart', [trace1, trace2, trace3], combined_layout);
+		Plotly.newPlot('redChart', [trace1], red_layout);
+		Plotly.newPlot('greenChart', [trace2], green_layout);
+		Plotly.newPlot('blueChart', [trace3], blue_layout);
+	});
+
 });
+
