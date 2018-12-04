@@ -327,7 +327,6 @@ $(window).ready(function(){
 	document.getElementById('btn').addEventListener('click', () => {
 		event.preventDefault();
 		let bucketSize = document.getElementById('bucketSize').value;
-		console.log(bucketSize);
 		trace1.xbins.size = bucketSize;
 		trace2.xbins.size = bucketSize;
 		trace3.xbins.size = bucketSize;
