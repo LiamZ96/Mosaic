@@ -27,7 +27,7 @@ SOFTWARE.
 'use-strict'
 $(document).ready(function() {
 	let buttonA = $('#buttonA'),
-		buttonB = $('#buttonb'),
+		buttonB = $('#buttonB'),
 		overlay = $('#overlay'),
 		magSelect = $("#mag-select");
 
