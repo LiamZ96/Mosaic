@@ -41,10 +41,7 @@ class Stitching:
 	def __init__(self):
 		self.images = []
 		self.sourceDirectory = ""
-		#pSize = 800
-		#eThresh = 0
 		self.resultsDirectory =""
-		#wtak = 0
 		self.results = []
 		
 
@@ -59,7 +56,6 @@ class Stitching:
 
 		if status == cv2.STITCHER_OK:
 			# Get results directory 
-			#resultsDir = os.path.join(os.path.dirname(__file__), "..", "results")
 			imagePath = os.path.join(resultsDir, "stiched_image.jpg")
 
 			# Check if results directory exist, if not create it
@@ -124,7 +120,6 @@ class Stitching:
 		self.collage(temp_dir,"resultA.jpg")
 
 		#now we run two round again but with WTA_K set to 2
-		#self.setDirectory(self.sourceDirectory)
 		
 		temp_dir = str(int(round(time.time())))
 		temp_dir = temp_dir + "/"		
@@ -137,9 +132,6 @@ class Stitching:
 		self.collage(temp_dir,"resultB.jpg")
 
 	def stitchUnorderedImages(self, wtak, pSize, eThresh, images):
-		#if not os.path.exists(self.resultsDirectory):
-		#	os.makedirs(self.resultsDirectory)
-
 		orb = cv2.ORB_create(WTA_K=wtak, scaleFactor=1.1,patchSize=pSize,edgeThreshold=eThresh)
 		if(wtak == 4):
 			bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
@@ -159,7 +151,6 @@ class Stitching:
 			else:
 				imagePath = os.path.join(self.resultsDirectory, "stiched_"+str(idx) +".jpg")
 				completed_images.append(img)				
-				#cv2.imwrite(imagePath,img)
 
 
 		print("Initial count", len(kpMap))
@@ -210,21 +201,16 @@ class Stitching:
 				del kpMap[bestKeyPoints[0]]
 			else:
 				matchLevel +=1
-				#kpMap[bestKeyPoints[0]] = stitchedImg[0]
-				#kpMap[parentKey] = stitchedImg[1]
 			if(matchLevel > (len(kpMap)+ 25)):			 				
 				matchLevel =0
 				matchThreshold =15
 				imagePath = os.path.join(self.resultsDirectory, "stiched_"+str(parentKey) +".jpg")				
 				completed_images.append(kpMap[parentKey][2])
-				#cv2.imwrite(imagePath,kpMap[parentKey][2])
 				del kpMap[parentKey]
 				parentKey = None
 			
 		# Check if results directory exist, if not create it
 		
-
-		#print(len(completed_images))
 		return completed_images
 
 	"""
@@ -241,7 +227,6 @@ class Stitching:
 		for file in os.listdir(self.sourceDirectory):			
 			if(file.find('jpg') != -1 or file.find('JPG') != -1):
 				path = os.path.join(self.sourceDirectory, file)
-				#self.images.append(cv2.imread(path, cv2.IMREAD_COLOR))
 				img = Image.open(path)
 				exif = { ExifTags.TAGS[k]: v for k, v in img._getexif().items() if k in ExifTags.TAGS }
 				current_images[path] = exif['DateTimeOriginal']
@@ -256,7 +241,6 @@ class Stitching:
 		self.resultsDirectory = path
 
 	def __stitchImages(self, firstImage, secondImage, matches, wtak, pSize, eThresh):
-		#print(firstImage, secondImage)
 		# Create stitcher and stitch images
 		stitcher = cv2.createStitcher(True)
 		orb = cv2.ORB_create(WTA_K=wtak, scaleFactor=1.1,patchSize=pSize, edgeThreshold=eThresh)

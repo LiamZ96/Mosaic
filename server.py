@@ -24,7 +24,6 @@ SOFTWARE.
 '''Authors: Jacob Wakefield'''
 
 from gevent import monkey
-#monkey.patch_all() this breaks Multiprocessing.Queue. 
 from Server import app
 import webbrowser
 from gevent.pywsgi import WSGIServer

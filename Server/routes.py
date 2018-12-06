@@ -91,8 +91,6 @@ def uploadImages():
         imgPath = newDir + "/images/" + str(secure_filename(i.filename))
         i.save(imgPath)
     
-
-    #TODO: return location of the directory to the user
     return jsonify({"status": 0, "msg": "Success","location": newDir.replace("Server/resources/uploads","")}) #redirect to homepage
 
 @app.route('/uploadVideo', methods=["POST"])
@@ -119,9 +117,7 @@ def uploadVideo():
 def getStitchedImage(directory): 
     dirPrefix="Server/resources/uploads/"
     stitcher = Stitching()
-    #stitcher.setDirectory(dirPrefix + directory + "/images")
-    #stitcher.setResultsDirectory(dirPrefix + directory + "/maps/")
-
+    
     stitcher.twoRoundStitch(dirPrefix + directory + "/images/", dirPrefix + directory + "/maps/")
     return render_template('stitched.html', direct=directory)
 

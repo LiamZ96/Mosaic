@@ -168,7 +168,6 @@ $(document).ready(function() {
         })
         .done(function(e) {
             if (e.status === 0) {
-                // TODO: Add in location of next view
                 window.location.href = 'getStitchedImage'+e.location;
             }
             else {
