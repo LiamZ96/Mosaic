@@ -34,7 +34,7 @@ PORT = 5000
 
 def main(): 
     pool = gPool(1000) #create thread pool with a limit of 1000
-    http_server = WSGIServer(('', PORT), app, spawn=pool) #create wsgi server 
+    http_server = WSGIServer(('0.0.0.0', PORT), app, spawn=pool) #create wsgi server 
     
     url = "http://localhost:"+str(PORT)+"/"
     webbrowser.open(url, new=2) #Opens in new tab if possible
