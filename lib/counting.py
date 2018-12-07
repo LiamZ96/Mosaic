@@ -56,8 +56,7 @@ class Counting:
         self.grayScaleMap = cv2.imread(imagePath,0) # create grayscale cv2 img
         self.colorMap = cv2.imread(imagePath) # create color cv2 img
         self.colorBeads = []
-        self.waterBeads = []
-        
+        self.waterBeads = []        
 
     """
         Description: a function that takes a map of images and counts the beads.
@@ -70,7 +69,8 @@ class Counting:
         
         img = self.grayScaleMap
         cimg = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
-        circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,dp=houghConfig["dp"],minDist=houghConfig["minDist"],
+        blur = cv2.GaussianBlur(img,(5,5),0)
+        circles = cv2.HoughCircles(blur,cv2.HOUGH_GRADIENT,dp=houghConfig["dp"],minDist=houghConfig["minDist"],
                             param1=houghConfig["param1"],param2=houghConfig["param2"],minRadius=houghConfig["minRadius"],maxRadius=houghConfig["maxRadius"])
 
         circles = np.uint16(np.around(circles))
@@ -87,10 +87,7 @@ class Counting:
                 result.append(color)
             else: 
                 self.waterBeads.append(color)
-        #plt.imshow(cimg),plt.show()
         imagePath = '/'.join(self.imagePath.split('/')[:-2]) + '/results/'
-        #images = [file for file in listdir(imagePath) if path.isfile((imagePath+file))]
-        #fileNum = len(images)
         imagePath += 'result_image.jpg'#+ str(fileNum) +'.jpg'
         cv2.imwrite(imagePath, cimg)
 
