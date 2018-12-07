@@ -56,6 +56,11 @@ $(window).ready(function(){
 	tableHeader.appendChild(tableHeaderRow);
 	table.appendChild(tableHeader);
 
+	var loc = window.location.pathname;
+	var dir = loc.substring(0, loc.lastIndexOf('/'));
+	console.log(`./uploads/${dir.substr(12).slice(0, -5)}/results/beads.csv`);
+	document.getElementById('csv').href = `.../uploads/${dir.substr(12).slice(0, -5)}/results/beads.csv`;
+
 
 	let getHue = function(red, green, blue) {
 
