@@ -129,8 +129,9 @@ def getResults(directory):
         magLevel = HoughConfig.OBJX4
     else: 
         magLevel = HoughConfig.OBJX10
+    resultsDirectory = directory.split("/")[0]
     serverDirectory = 'Server/resources/uploads/' + directory
     count = Counting(serverDirectory)
     circles = count.getColorBeads(magLevel)
     count.makeBeadsCSV()
-    return render_template('results.html',colorBeads=circles,waterBeads=count.waterBeads, mapLocation=directory) 
+    return render_template('results.html',colorBeads=circles,waterBeads=count.waterBeads, mapLocation=directory, resultsDirectory=resultsDirectory) 

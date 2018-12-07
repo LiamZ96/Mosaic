@@ -38,9 +38,9 @@ var imageObj = undefined; //the stitched map image
         ctx.beginPath();
         ctx.arc(x,y,radius,0,2*Math.PI);
         if(bead[1]){
-            ctx.strokeStyle="blue";
+            ctx.strokeStyle=$("#waterBeadOutline").val();
         }else{
-            ctx.strokeStyle="red";
+            ctx.strokeStyle=$("#colorBeadOutline").val();
         }
         ctx.lineWidth=5;
         ctx.stroke();
@@ -168,6 +168,13 @@ $(window).ready(function() {
             drawBead(bead,ctx);
         });
     };
+
+    $("#colorBeadOutline").change(function(){
+        redraw(ctx);
+    });
+    $("#waterBeadOutline").change(function(){
+        redraw(ctx);
+    });
 
     $("#mapCanvas").mousemove(function (e) {
         var rect = canvas.getBoundingClientRect(), //get real coordinates of hover on canvas

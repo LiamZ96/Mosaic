@@ -56,8 +56,7 @@ class Counting:
         self.grayScaleMap = cv2.imread(imagePath,0) # create grayscale cv2 img
         self.colorMap = cv2.imread(imagePath) # create color cv2 img
         self.colorBeads = []
-        self.waterBeads = []
-        
+        self.waterBeads = []        
 
     """
         Description: a function that takes a map of images and counts the beads.
