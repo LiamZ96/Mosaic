@@ -25,7 +25,7 @@ SOFTWARE.
 # Mosaic
 
 # Description
-Microbead detecting software written for CSC-450. Intended to stitch together images provided by user and count the total number of microbeads.
+Microbead detecting software written for CSC-450. Intended to stitch together images provided by user and count the total number of microbeads. This soource code is hosted at https://github.com/LiamZ96/Mosaic.
 
 # Installation Instructions
 * To download python packages ensure you have the latest version of python3 installed, and that you have it in your path. Then in the command prompt navigate to where you have mosaic installed, and run this command "python -m pip install -r requirements.txt". 
