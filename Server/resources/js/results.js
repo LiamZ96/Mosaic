@@ -119,6 +119,42 @@ $(window).ready(function(){
 	});
 
 	document.getElementsByClassName('graphdiv')[0].replaceChild(table, beadTableDiv);
+	
+	let rgbToHsl = function(r,g,b) {   
+		let HslObject = {},
+			red = (r/255).toFixed(3),
+			green = (g/255).toFixed(3),
+			blue = (b/255).toFixed(3),
+			min = Math.min(Math.min(red, green), blue),
+			max = Math.max(Math.max(red, green), blue);
+		HslObject.luminace = ((min + max)/2).toFixed(4) * 100;//which rounded up is equal to 28%
+		if(min == max){
+			HslObject.saturation = 0;
+		}else{
+			if(HslObject.luminace < 50){
+				HslObject.saturation = ((max - min)/(max + min)).toFixed(2) * 100;
+			}else if(HslObject.luminace > 50){
+				HslObject.saturation = ((max - min)/(2 - max - min)).toFixed(2) * 100;
+			}
+		}
+		HslObject.hue = 0;
+		if (max == red) {
+			HslObject.hue = (green - blue) / (max - min);
+	
+		} else if (max == green) {
+			HslObject.hue = 2 + (blue - red) / (max - min);
+	
+		} else {
+			HslObject.hue = 4 + (red - green) / (max - min);
+		}
+		HslObject.hue = Math.round(HslObject.hue * 60);
+		if (HslObject.hue < 0){
+			HslObject.hue = HslObject.hue + 360;
+		}
+		return(HslObject);
+	};
+
+	console.log(rgbToHsl(234, 0, 34));
 
 	let rgbToHex = function (rgb) { 
 		let hex = Number(rgb).toString(16);
