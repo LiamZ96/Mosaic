@@ -57,29 +57,8 @@ $(window).ready(function(){
 	table.appendChild(tableHeader);
 
 
-	let getHue = function(red, green, blue) {
-
-		let min = Math.min(Math.min(red, green), blue);
-		let max = Math.max(Math.max(red, green), blue);
-	
-		if (min == max) {
-			return 0;
-		}
-	
-		let hue = 0;
-		if (max == red) {
-			hue = (green - blue) / (max - min);
-	
-		} else if (max == green) {
-			hue = 2 + (blue - red) / (max - min);
-	
-		} else {
-			hue = 4 + (red - green) / (max - min);
-		}
-	
-		hue = Math.round(hue * 60);
-		if (hue < 0) hue = hue + 360;
-	
+	let getColorName = function(red, green, blue) {
+		let hue = getHue(red, green, blue);	
 		if (hue < 30)   
 			return "red";
 		if (hue < 90)   
@@ -120,39 +99,65 @@ $(window).ready(function(){
 
 	document.getElementsByClassName('graphdiv')[0].replaceChild(table, beadTableDiv);
 	
-	let rgbToHsl = function(r,g,b) {   
-		let HslObject = {},
-			red = (r/255).toFixed(3),
-			green = (g/255).toFixed(3),
-			blue = (b/255).toFixed(3),
-			min = Math.min(Math.min(red, green), blue),
-			max = Math.max(Math.max(red, green), blue);
-		HslObject.luminace = ((min + max)/2).toFixed(4) * 100;//which rounded up is equal to 28%
-		if(min == max){
-			HslObject.saturation = 0;
-		}else{
-			if(HslObject.luminace < 50){
-				HslObject.saturation = ((max - min)/(max + min)).toFixed(2) * 100;
-			}else if(HslObject.luminace > 50){
-				HslObject.saturation = ((max - min)/(2 - max - min)).toFixed(2) * 100;
-			}
-		}
-		HslObject.hue = 0;
-		if (max == red) {
-			HslObject.hue = (green - blue) / (max - min);
-	
-		} else if (max == green) {
-			HslObject.hue = 2 + (blue - red) / (max - min);
-	
-		} else {
-			HslObject.hue = 4 + (red - green) / (max - min);
-		}
-		HslObject.hue = Math.round(HslObject.hue * 60);
-		if (HslObject.hue < 0){
-			HslObject.hue = HslObject.hue + 360;
-		}
-		return(HslObject);
+	let rgbToHsl = function(r,g,b) { 
+		return  {	
+			hue: getHue(r, g, b),
+			saturation: getSaturation(r, g, b),
+			luminace: getLuminance(r, g, b) 
+		};
 	};
+
+	let getRatio = (value) => {
+		return (value/255).toFixed(3);
+	}
+
+	let getHue = (r, g, b) => {
+		let min, max, hue = 0;
+		r = getRatio(r);
+		g = getRatio(g);
+		b = getRatio(b);
+		min = Math.min(r, g, b);
+		max = Math.max(r, g, b);
+	
+		if (min == max) return hue;
+
+		if (max == r) 
+			hue = (g - b) / (max - min);	
+		else if (max == g) 
+			hue = 2 + (b - r) / (max - min);	
+		else
+			hue = 4 + (r - g) / (max - min);
+	
+		hue = Math.round(hue * 60);
+		if (hue < 0) hue = hue + 360;
+		return hue;
+	}
+
+	let getSaturation = (r, g, b) => {
+		let min, max, saturation, luminace = getLuminance(r, g, b);
+		r = getRatio(r);
+		g = getRatio(g);
+		b = getRatio(b);
+		min = Math.min(r, g, b);
+		max = Math.max(r, g, b);
+			
+		if(min == max)
+			saturation = 0;
+		else
+			if(luminace < 50)
+				saturation = ((max - min)/(max + min)).toFixed(2) * 100;
+			else if(luminace > 50)
+				saturation = ((max - min)/(2 - max - min)).toFixed(2) * 100;
+		
+		return saturation;
+	}
+
+	let getLuminance = (r, g, b) => {
+		r = getRatio(r);
+		g = getRatio(g);
+		b = getRatio(b);
+		return ((Math.min(r, g, b) + Math.max(r, g, b))/2).toFixed(4) * 100;
+	}
 
 	console.log(rgbToHsl(234, 0, 34));
 
@@ -189,7 +194,7 @@ $(window).ready(function(){
 		blue.push(circle[0][2]);
 
 		//Get the hue of the bead and add it to the count
-		let hue = getHue(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2]));
+		let hue = getColorName(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2]));
 		if(hue === 'red')
 			redCount++;
 		else if(hue === 'yellow')
