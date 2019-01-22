@@ -181,7 +181,7 @@ class Counting:
         @param
         @param 
         @return 
-    """ 
+    """
     def makeBeadsCSV(self):
         newPath = self.imagePath
         endIndex = newPath.rfind("/")
@@ -190,7 +190,7 @@ class Counting:
         newPath = newPath + "/beads.csv"
         with open(newPath, mode='w', newline='') as beadFile:
             writer = csv.writer(beadFile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            colNames = ['Bead Number', 'Red Val', 'Green Val', 'Blue Val', 'X-Coord', 'Y-Coord', 'Radius']
+            colNames = ['Bead Number', 'Red Val', 'Green Val', 'Blue Val', 'X-Coord', 'Y-Coord', 'Radius', 'Is Water']
             writer.writerow(colNames)
             i = 1
             for bead in self.colorBeads:
@@ -201,5 +201,17 @@ class Counting:
                 y = bead[2][1]
                 radius = bead[2][2]
                 beadNum = i
-                writer.writerow([beadNum, r, g, b, x, y, radius])
+                isWater = "No"
+                writer.writerow([beadNum, r, g, b, x, y, radius, isWater])
+                i += 1
+            for bead in self.waterBeads:
+                r = bead[0][0]
+                g = bead[0][1]
+                b = bead[0][2]
+                x = bead[2][0]
+                y = bead[2][1]
+                radius = bead[2][2]
+                beadNum = i
+                isWater = "Yes"
+                writer.writerow([beadNum, r, g, b, x, y, radius, isWater])
                 i += 1
