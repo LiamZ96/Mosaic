@@ -109,7 +109,7 @@ $(window).ready(function(){
 
 	let getRatio = (value) => {
 		return (value/255).toFixed(4);
-	}
+    }
 
 	let getHue = (r, g, b) => {
 		let min, max, hue = 0;
@@ -145,13 +145,6 @@ $(window).ready(function(){
 			saturation = (max - min) / (1 - Math.abs(2 * luminance - 1))
 		else if(luminance == 1)
 			saturation = 0;
-		// if(min == max)
-		// 	saturation = 0;
-		// else
-		// 	if(luminance < 50)
-		// 		saturation = ((max - min)/(max + min)).toFixed(4) * 100;
-		// 	else if(luminance > 50)
-		// 		saturation = ((max - min)/(2 - max - min)).toFixed(4) * 100;
 		
 		return (saturation * 100).toFixed(2);
 	}
@@ -275,10 +268,13 @@ $(window).ready(function(){
 	  };
 	  let r_g_layout = {
 		xaxis: {
-		  range: [ 0, 255 ]
+          range: [ 0, 265 ],
+          title: "Green Value"
+          
 		},
 		yaxis: {
-			range: [ 0, 255 ]
+            range: [ 0, 265 ],
+            title: "Red Value"
 		},
 		title:'Red V Green'
 	  };
@@ -293,10 +289,12 @@ $(window).ready(function(){
 	  };
 	  let r_b_layout = {
 		xaxis: {
-			range: [ 0, 255 ]
+            range: [ 0, 265 ],
+            title: "Blue Value"
 		},
 		yaxis: {
-			range: [ 0, 255 ]
+            range: [ 0, 265 ],
+            title: "Red Value"
 		},
 		title:'Red V Blue'
 	  };
@@ -311,10 +309,12 @@ $(window).ready(function(){
 	  };
 	  let g_b_layout = {
 		xaxis: {
-			range: [ 0, 255 ]
+            range: [ 0, 265 ],
+            title: "Blue Value"
 		},
 		yaxis: {
-			range: [ 0, 255 ]
+            range: [ 0, 265 ],
+            title: "Green Value"
 		},
 		title:'Green V Blue'
 	  };
@@ -329,10 +329,12 @@ $(window).ready(function(){
 	  };
 	  let sat_hue_layout = {
 		xaxis: {
-		  range: [ 0, 360 ]
+          range: [ 0, 360 ],
+          title: "Hue Value (in degrees)"
 		},
 		yaxis: {
-		  range: [ 0, 100 ]
+          range: [ 0, 100 ],
+          title: "% Saturation"
 		},
 		title:'Saturation V Hue'
 	  };
@@ -347,10 +349,12 @@ $(window).ready(function(){
 	  };
 	  let lum_hue_layout = {
 		xaxis: {
-		  range: [ 0, 360 ]
+		  range: [ 0, 360 ],
+          title: "Hue Value (in degrees)"
 		},
 		yaxis: {
-		  range: [ 0, 100 ]
+		  range: [ 0, 100 ],
+          title: "% Luminance"
 		},
 		title:'Luminance V Hue'
 	  };
@@ -365,10 +369,12 @@ $(window).ready(function(){
 	  };
 	  let lum_sat_layout = {
 		xaxis: {
-		  range: [ 0, 100 ]
+		  range: [ 0, 100 ],
+          title: "% Saturation"
 		},
 		yaxis: {
-		  range: [ 0, 100 ]
+		  range: [ 0, 100 ],
+          title: "% Luminance"
 		},
 		title:'Luminance V Saturation'
 	  };
