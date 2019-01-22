@@ -333,7 +333,7 @@ $(window).ready(function(){
           title: "Hue Value (in degrees)"
 		},
 		yaxis: {
-          range: [ 0, 100 ],
+          range: [ 0, 110 ],
           title: "% Saturation"
 		},
 		title:'Saturation V Hue'
@@ -353,7 +353,7 @@ $(window).ready(function(){
           title: "Hue Value (in degrees)"
 		},
 		yaxis: {
-		  range: [ 0, 100 ],
+		  range: [ 0, 110 ],
           title: "% Luminance"
 		},
 		title:'Luminance V Hue'
@@ -369,11 +369,11 @@ $(window).ready(function(){
 	  };
 	  let lum_sat_layout = {
 		xaxis: {
-		  range: [ 0, 100 ],
+		  range: [ 0, 110 ],
           title: "% Saturation"
 		},
 		yaxis: {
-		  range: [ 0, 100 ],
+		  range: [ 0, 110 ],
           title: "% Luminance"
 		},
 		title:'Luminance V Saturation'
