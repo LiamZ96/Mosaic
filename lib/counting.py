@@ -174,6 +174,62 @@ class Counting:
             # x and y given here were assuming that the center was at 0,0 therefore you must add the actual center coordinates to give accurate ones back
             yield from set((( centerX + x, centerY + y), (centerX + x, centerY -y), (centerX -x, centerY + y), (centerX -x, centerY -y),))
                     
+        """
+        Description: 
+        @param 
+        @param
+        @param 
+        @return 
+    """ 
+    def getRatio(self, value):
+        return '{:.{}f}'.format((value / 255), 4)
+
+    def getLuminance(self, r, g, b):
+        r = self.getRatio(r)
+        g = self.getRatio(g)
+        b = self.getRatio(b)
+        return round(((float(min(r, g, b)) + float(max(r, g, b))) / 2) * 100, 2)
+
+    def getHue(self, r, g, b):
+        hue = 0
+        r = float(self.getRatio(r))
+        g = float(self.getRatio(g))
+        b = float(self.getRatio(b))
+        mini = float(min(r, g, b))
+        maxi = float(max(r, g, b))
+
+        if mini == maxi:
+            return hue
+        else :
+            pass
+
+        if (maxi == r):
+            hue = (g - b) / (maxi - mini)
+        elif (maxi == g):
+            hue = 2 + (b - r) / (maxi - mini)
+        else :
+            hue = 4 + (r - g) / (maxi - mini)
+
+        hue = round(hue * 60, 2)
+        if (hue < 0):
+            hue = hue + 360
+        return '{:.{}f}'.format(hue, 2)
+
+    def getSaturation(self, r, g, b):
+        luminance = (self.getLuminance(r, g, b) / 100)
+        r = float(self.getRatio(r))
+        g = float(self.getRatio(g))
+        b = float(self.getRatio(b))
+        mini = float(min(r, g, b))
+        maxi = float(max(r, g, b))
+
+        if (luminance < 1):
+            saturation = (maxi - mini) / (1 - abs(2 * luminance - 1))
+        elif(luminance == 1):
+            saturation = 0
+        if(saturation * 100 > 100):
+            return 100
+        return '{:.{}f}'.format(saturation * 100, 2)
 
     """
         Description: 
@@ -190,28 +246,34 @@ class Counting:
         newPath = newPath + "/beads.csv"
         with open(newPath, mode='w', newline='') as beadFile:
             writer = csv.writer(beadFile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            colNames = ['Bead Number', 'Red Val', 'Green Val', 'Blue Val', 'X-Coord', 'Y-Coord', 'Radius', 'Is Water']
+            colNames = ['Bead Number', 'Red Val', 'Green Val', 'Blue Val', 'Hue', 'Saturation', 'Luminance', 'X-Coord', 'Y-Coord', 'Radius', 'Is Water']
             writer.writerow(colNames)
             i = 1
             for bead in self.colorBeads:
                 r = bead[0][0]
                 g = bead[0][1]
                 b = bead[0][2]
+                h = self.getHue(r, g, b)
+                s = self.getSaturation(r, g, b)
+                l = self.getLuminance(r, g, b)
                 x = bead[2][0]
                 y = bead[2][1]
                 radius = bead[2][2]
                 beadNum = i
                 isWater = "No"
-                writer.writerow([beadNum, r, g, b, x, y, radius, isWater])
+                writer.writerow([beadNum, r, g, b, h, s, l, x, y, radius, isWater])
                 i += 1
             for bead in self.waterBeads:
                 r = bead[0][0]
                 g = bead[0][1]
                 b = bead[0][2]
+                h = self.getHue(r, g, b)
+                s = self.getSaturation(r, g, b)
+                l = self.getLuminance(r, g, b)
                 x = bead[2][0]
                 y = bead[2][1]
                 radius = bead[2][2]
                 beadNum = i
                 isWater = "Yes"
-                writer.writerow([beadNum, r, g, b, x, y, radius, isWater])
+                writer.writerow([beadNum, r, g, b, h, s, l, x, y, radius, isWater])
                 i += 1
