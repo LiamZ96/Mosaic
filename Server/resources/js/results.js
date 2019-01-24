@@ -57,29 +57,8 @@ $(window).ready(function(){
 	table.appendChild(tableHeader);
 
 
-	let getHue = function(red, green, blue) {
-
-		let min = Math.min(Math.min(red, green), blue);
-		let max = Math.max(Math.max(red, green), blue);
-	
-		if (min == max) {
-			return 0;
-		}
-	
-		let hue = 0;
-		if (max == red) {
-			hue = (green - blue) / (max - min);
-	
-		} else if (max == green) {
-			hue = 2 + (blue - red) / (max - min);
-	
-		} else {
-			hue = 4 + (red - green) / (max - min);
-		}
-	
-		hue = Math.round(hue * 60);
-		if (hue < 0) hue = hue + 360;
-	
+	let getColorName = function(red, green, blue) {
+		let hue = getHue(red, green, blue);	
 		if (hue < 30)   
 			return "red";
 		if (hue < 90)   
@@ -119,6 +98,64 @@ $(window).ready(function(){
 	});
 
 	document.getElementsByClassName('graphdiv')[0].replaceChild(table, beadTableDiv);
+	
+	let rgbToHsl = function(r,g,b) { 
+		return  {	
+			hue: getHue(r, g, b),
+			saturation: getSaturation(r, g, b),
+			luminance: getLuminance(r, g, b) 
+		};
+	};
+
+	let getRatio = (value) => {
+		return (value/255).toFixed(4);
+    }
+
+	let getHue = (r, g, b) => {
+		let min, max, hue = 0;
+		r = getRatio(r);
+		g = getRatio(g);
+		b = getRatio(b);
+		min = Math.min(r, g, b);
+		max = Math.max(r, g, b);
+	
+		if (min == max) return hue;
+
+		if (max == r) 
+			hue = (g - b) / (max - min);	
+		else if (max == g) 
+			hue = 2 + (b - r) / (max - min);	
+		else
+			hue = 4 + (r - g) / (max - min);
+	
+		hue = Math.round(hue * 60);
+		if (hue < 0) hue = hue + 360;
+		return hue.toFixed(2);
+	}
+
+	let getSaturation = (r, g, b) => {
+		let min, max, saturation, luminance = getLuminance(r, g, b) / 100;
+		r = getRatio(r);
+		g = getRatio(g);
+		b = getRatio(b);
+		min = Math.min(r, g, b);
+		max = Math.max(r, g, b);
+			
+		if(luminance < 1)
+			saturation = (max - min) / (1 - Math.abs(2 * luminance - 1))
+		else if(luminance == 1)
+			saturation = 0;
+        if(saturation * 100 > 100)
+            return 100;
+		return (saturation * 100).toFixed(2);
+	}
+
+	let getLuminance = (r, g, b) => {
+		r = getRatio(r);
+		g = getRatio(g);
+		b = getRatio(b);
+		return (((Math.min(r, g, b) + Math.max(r, g, b))/2) * 100).toFixed(2);
+	}
 
 	let rgbToHex = function (rgb) { 
 		let hex = Number(rgb).toString(16);
@@ -135,42 +172,38 @@ $(window).ready(function(){
 		return '#' + red+green+blue;
 	  };
 
-	let red = [],
-		green = [],
-		blue = [],
-		i,
-		redCount = 0,
-		yellowCount = 0,
-		greenCount = 0,
-		cyanCount = 0,
-		blueCount = 0,
-		magentaCount = 0,
-		countedString = `There were `;	
+	let red = [], green = [], blue = [], hue = [], saturation = [], luminance = [],
+	i = 0, nameAry = [],redCount = 0, yellowCount = 0, greenCount = 0, cyanCount = 0,
+	blueCount = 0, magentaCount = 0, countedString = `There were `;	
+
+	let countColor = (color) => {
+		if(color === 'red')
+			redCount++;
+		else if(color === 'yellow')
+			yellowCount++;
+		else if(color === 'green')
+			greenCount++;
+		else if(color === 'cyan')
+			cyanCount++;
+		else if(color === 'blue')
+			blueCount++;
+		else if(color === 'magenta')
+			magentaCount++;
+	}
 
 	beads.colorBeads.forEach(function(circle){
-		red.push(circle[0][0]);
-		green.push(circle[0][1]);
-		blue.push(circle[0][2]);
-
-		//Get the hue of the bead and add it to the count
-		let hue = getHue(Math.round(circle[0][0]), Math.round(circle[0][1]), Math.round(circle[0][2]));
-		if(hue === 'red')
-			redCount++;
-		else if(hue === 'yellow')
-			yellowCount++;
-		else if(hue === 'green')
-			greenCount++;
-		else if(hue === 'cyan')
-			cyanCount++;
-		else if(hue === 'blue')
-			blueCount++;
-		else if(hue === 'magenta')
-			magentaCount++;
-		
+		let r = circle[0][0], g = circle[0][1], b = circle[0][2];
+		red.push(r);
+		green.push(g);
+		blue.push(b);
+		hue.push(Number(getHue(r, g, b)));
+		saturation.push(Number(getSaturation(r, g, b)));
+		luminance.push(Number(getLuminance(r, g, b)));
+		nameAry.push((i+1).toString());
 		i++;
+		countColor(getColorName(Math.round(r), Math.round(g), Math.round(b)));	
 	});
-
-
+	console.log(nameAry)
 	if(yellowCount>0)
 		countedString += `${yellowCount} yellow beads, `;
 	if(redCount>0)
@@ -224,6 +257,128 @@ $(window).ready(function(){
 		}
 		]
 	};
+	//New Scatter Plots
+	let r_g = {
+		x: green,
+		y: red,
+		mode: 'markers',
+		type: 'scatter',
+		name: '',
+		text: nameAry,
+		marker: { size: 12 }
+	  };
+	  let r_g_layout = {
+		xaxis: {
+          range: [ 0, 265 ],
+          title: "Green Value"
+          
+		},
+		yaxis: {
+            range: [ 0, 265 ],
+            title: "Red Value"
+		},
+		title:'Red V Green'
+	  };
+	  let r_b = {
+		x: blue,
+		y: red,
+		mode: 'markers',
+		type: 'scatter',
+		name: '',
+		text: nameAry,
+		marker: { size: 12 }
+	  };
+	  let r_b_layout = {
+		xaxis: {
+            range: [ 0, 265 ],
+            title: "Blue Value"
+		},
+		yaxis: {
+            range: [ 0, 265 ],
+            title: "Red Value"
+		},
+		title:'Red V Blue'
+	  };
+	  let g_b = {
+		x: blue,
+		y: green,
+		mode: 'markers',
+		type: 'scatter',
+		name: '',
+		text: nameAry,
+		marker: { size: 12 }
+	  };
+	  let g_b_layout = {
+		xaxis: {
+            range: [ 0, 265 ],
+            title: "Blue Value"
+		},
+		yaxis: {
+            range: [ 0, 265 ],
+            title: "Green Value"
+		},
+		title:'Green V Blue'
+	  };
+	  let sat_hue = {
+		x: hue,
+		y: saturation,
+		mode: 'markers',
+		type: 'scatter',
+		name: 'Saturation V Hue',
+		text: nameAry,
+		marker: { size: 12 }
+	  };
+	  let sat_hue_layout = {
+		xaxis: {
+          range: [ 0, 360 ],
+          title: "Hue Value (in degrees)"
+		},
+		yaxis: {
+          range: [ 0, 110 ],
+          title: "% Saturation"
+		},
+		title:'Saturation V Hue'
+	  };
+	  let lum_hue = {
+		x: hue,
+		y: luminance,
+		mode: 'markers',
+		type: 'scatter',
+		name: 'Luminance V Hue',
+		text: nameAry,
+		marker: { size: 12 }
+	  };
+	  let lum_hue_layout = {
+		xaxis: {
+		  range: [ 0, 360 ],
+          title: "Hue Value (in degrees)"
+		},
+		yaxis: {
+		  range: [ 0, 110 ],
+          title: "% Luminance"
+		},
+		title:'Luminance V Hue'
+	  };
+	  let lum_sat = {
+		x: saturation,
+		y: luminance,
+		mode: 'markers',
+		type: 'scatter',
+		name: 'Luminance V Saturation',
+		text: nameAry,
+		marker: { size: 12 }
+	  };
+	  let lum_sat_layout = {
+		xaxis: {
+		  range: [ 0, 110 ],
+          title: "% Saturation"
+		},
+		yaxis: {
+		  range: [ 0, 110 ],
+          title: "% Luminance"
+		},
+		title:'Luminance V Saturation'
+	  };
 
 	//New Histograms
 	let trace1 = {
@@ -323,6 +478,13 @@ $(window).ready(function(){
 	Plotly.newPlot('redChart', [trace1], red_layout);
 	Plotly.newPlot('greenChart', [trace2], green_layout);
 	Plotly.newPlot('blueChart', [trace3], blue_layout);
+
+	Plotly.newPlot('r_g', [r_g], r_g_layout);
+	Plotly.newPlot('r_b', [r_b], r_b_layout);
+	Plotly.newPlot('g_b', [g_b], g_b_layout);
+	Plotly.newPlot('sat_hue', [sat_hue], sat_hue_layout);
+	Plotly.newPlot('lum_hue', [lum_hue], lum_hue_layout);
+	Plotly.newPlot('lum_sat', [lum_sat], lum_sat_layout);
 
 	document.getElementById('btn').addEventListener('click', () => {
 		event.preventDefault();
