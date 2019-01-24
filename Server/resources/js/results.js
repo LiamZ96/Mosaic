@@ -145,7 +145,8 @@ $(window).ready(function(){
 			saturation = (max - min) / (1 - Math.abs(2 * luminance - 1))
 		else if(luminance == 1)
 			saturation = 0;
-		
+        if(saturation * 100 > 100)
+            return 100;
 		return (saturation * 100).toFixed(2);
 	}
 
